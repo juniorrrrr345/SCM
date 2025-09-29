@@ -250,7 +250,7 @@ export default function Cart() {
         onClick={() => setIsOpen(false)}
       />
       
-      {/* Cart Panel */}
+      {/* Cart Panel - Optimisé mobile */}
       <div className="absolute right-0 top-0 h-full w-full max-w-md bg-gray-900 shadow-xl pointer-events-auto overflow-hidden">
         <div className="flex h-full flex-col">
           {/* Header */}
@@ -303,7 +303,7 @@ export default function Cart() {
           </div>
           
           {/* Content dynamique selon l'étape */}
-          <div className={`flex-1 overflow-y-auto ${currentStep === 'message' ? 'p-3' : 'p-6'}`}>
+          <div className={`flex-1 overflow-y-auto ${currentStep === 'message' ? 'p-3 pb-20' : 'p-6'}`}>
             {items.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-gray-400">
                 <ShoppingCart className="h-16 w-16 mb-4" />
@@ -717,72 +717,65 @@ export default function Cart() {
                   </div>
                 )}
 
-                {/* Étape message - Interface scrollable complète */}
+                {/* Étape message - Mobile First Design */}
                 {currentStep === 'message' && (
-                  <div className="space-y-4">
-                    {/* Header */}
-                    <div className="text-center bg-green-500/10 border border-green-500/20 rounded-lg p-3">
-                      <div className="text-green-400 font-medium mb-1">✅ Commande prête !</div>
-                      <div className="text-xs text-gray-300">
-                        Copiez votre message pour Signal
-                      </div>
+                  <div className="space-y-3 pb-8">
+                    {/* Header compact */}
+                    <div className="text-center bg-green-500/10 border border-green-500/20 rounded-lg p-2">
+                      <div className="text-green-400 font-medium text-sm">✅ Commande prête !</div>
                     </div>
                     
-                    {/* Message avec bouton copier */}
+                    {/* Bouton copier en premier - toujours visible */}
+                    <div className="text-center">
+                      <button
+                        onClick={async () => {
+                          try {
+                            await navigator.clipboard.writeText(orderMessage);
+                            setMessageCopied(true);
+                            toast.success('📋 Message copié ! Bouton Commander disponible en bas');
+                          } catch (err) {
+                            console.error('Erreur copie:', err);
+                            toast.error('Sélectionnez et copiez manuellement le texte');
+                          }
+                        }}
+                        className={`px-6 py-3 rounded-lg font-bold transition-all ${
+                          messageCopied 
+                            ? 'bg-green-500 text-white' 
+                            : 'bg-blue-500 hover:bg-blue-600 text-white'
+                        }`}
+                      >
+                        {messageCopied ? '✅ MESSAGE COPIÉ' : '📋 COPIER LE MESSAGE'}
+                      </button>
+                    </div>
+                    
+                    {/* Message dans zone réduite */}
                     <div className="bg-gray-800 border border-white/20 rounded-lg p-3">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-sm font-medium text-gray-300">📋 Votre commande :</span>
-                        <button
-                          onClick={async () => {
-                            try {
-                              await navigator.clipboard.writeText(orderMessage);
-                              setMessageCopied(true);
-                              toast.success('📋 Message copié ! Scrollez en bas pour le bouton Commander');
-                            } catch (err) {
-                              console.error('Erreur copie:', err);
-                              toast.error('Sélectionnez et copiez manuellement le texte');
-                            }
-                          }}
-                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                            messageCopied 
-                              ? 'bg-green-500 text-white' 
-                              : 'bg-blue-500 hover:bg-blue-600 text-white'
-                          }`}
-                        >
-                          {messageCopied ? '✅ Copié' : '📋 Copier'}
-                        </button>
-                      </div>
-                      
-                      {/* Message complet visible */}
-                      <div className="bg-black rounded-lg p-4 relative">
-                        <div className="text-sm text-white whitespace-pre-wrap leading-relaxed select-all cursor-text">
+                      <div className="text-xs text-gray-300 mb-2">📋 Votre commande :</div>
+                      <div className="bg-black rounded-lg p-3 max-h-40 overflow-y-auto">
+                        <div className="text-xs text-white whitespace-pre-wrap leading-relaxed select-all cursor-text">
                           {orderMessage}
                         </div>
                       </div>
                     </div>
                     
-                    {/* Instructions de scroll si message copié */}
+                    {/* Bouton Commander - toujours visible après copie */}
                     {messageCopied && (
-                      <div className="space-y-4">
-                        <div className="text-center bg-green-500/10 border border-green-500/20 rounded-lg p-3">
-                          <div className="text-green-400 text-sm font-medium mb-2">
-                            ✅ Message copié avec succès !
-                          </div>
-                          <div className="text-gray-300 text-xs">
-                            Bouton Commander ci-dessous 👇
+                      <div className="space-y-3 mt-6">
+                        <div className="text-center bg-green-500/10 border border-green-500/20 rounded-lg p-2">
+                          <div className="text-green-400 text-sm font-medium">
+                            ✅ Prêt à commander !
                           </div>
                         </div>
                         
-                        {/* Bouton Commander dans la zone scrollable */}
                         <button
                           onClick={() => {
                             if (orderLink && orderLink.trim() !== '') {
                               try {
-                                console.log('📱 Ouverture Signal depuis bouton Commander:', orderLink);
+                                console.log('📱 Ouverture Signal:', orderLink);
                                 window.open(orderLink, '_blank');
                                 toast.success('📱 Signal ouvert ! Collez votre message');
                                 
-                                // Vider le panier après ouverture
+                                // Vider le panier
                                 setTimeout(() => {
                                   clearCart();
                                   setIsOpen(false);
@@ -798,13 +791,13 @@ export default function Cart() {
                               toast.error('❌ Aucun lien Signal configuré');
                             }
                           }}
-                          className="w-full rounded-lg bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 py-4 font-bold text-white transition-all text-xl shadow-lg animate-pulse"
+                          className="w-full rounded-lg bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 py-4 font-bold text-white transition-all text-lg shadow-xl animate-pulse border-2 border-green-400"
                         >
                           📱 COMMANDER SUR SIGNAL
                         </button>
                         
-                        {/* Espacement pour éviter que le bouton soit coupé */}
-                        <div className="h-4"></div>
+                        {/* Espace de sécurité mobile */}
+                        <div className="h-8"></div>
                       </div>
                     )}
                   </div>
