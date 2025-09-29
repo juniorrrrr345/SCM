@@ -34,7 +34,8 @@ export default function Cart() {
     meetup: [] as string[],
     envoi: [] as string[]
   });
-  const [currentStep, setCurrentStep] = useState<'cart' | 'service' | 'schedule' | 'review'>('cart');
+  const [currentStep, setCurrentStep] = useState<'cart' | 'service' | 'schedule' | 'review' | 'message'>('cart');
+  const [orderMessage, setOrderMessage] = useState('');
   
   // Auto-navigation entre les étapes (désactivée pour permettre la modification)
   useEffect(() => {
@@ -157,81 +158,23 @@ export default function Cart() {
       console.log(`📱 Pas de lien Signal configuré pour ${targetService}, utilisation du lien principal`);
     }
     
-    // Copier le message dans le presse-papiers ET rediriger vers Signal
-    try {
-      await navigator.clipboard.writeText(message);
-      console.log(`📋 Message copié pour ${targetService}:`, message);
+    // Afficher le message pour copie manuelle et redirection
+    console.log(`📋 Message généré pour ${targetService}:`, message);
+    
+    // Stocker le message et le lien pour affichage
+    setOrderMessage(message);
+    
+    // Passer à l'étape d'affichage du message
+    setCurrentStep('message');
+    
+    // Préparer la redirection vers Signal
+    if (chosenLink && chosenLink.trim() !== '') {
+      console.log(`📱 Lien Signal disponible:`, chosenLink);
       
-      // Rediriger vers Signal après avoir copié
-      if (chosenLink && chosenLink.trim() !== '') {
-        // Encoder le message pour l'URL
-        const encodedMessage = encodeURIComponent(message);
-        
-        // Construire l'URL Signal
-        let finalUrl = chosenLink;
-        
-        // Signal supporte différents formats
-        if (chosenLink.includes('signal.me') || chosenLink.includes('signal.org') || chosenLink.includes('signal://')) {
-          // Pour Signal, on ne peut pas pré-remplir le message dans l'URL
-          // On ouvre juste Signal et on laisse l'utilisateur coller
-          finalUrl = chosenLink;
-        } else if (chosenLink.includes('wa.me') || chosenLink.includes('whatsapp.com')) {
-          // WhatsApp supporte le paramètre text
-          const separator = chosenLink.includes('?') ? '&' : '?';
-          finalUrl = `${chosenLink}${separator}text=${encodedMessage}`;
-        } else if (chosenLink.includes('t.me')) {
-          // Telegram supporte le paramètre text (sauf liens d'invitation)
-          if (chosenLink.includes('/+')) {
-            finalUrl = chosenLink;
-          } else {
-            const separator = chosenLink.includes('?') ? '&' : '?';
-            finalUrl = `${chosenLink}${separator}text=${encodedMessage}`;
-          }
-        } else {
-          // Autre lien personnalisé
-          finalUrl = chosenLink;
-        }
-        
-        console.log(`📱 Redirection vers Signal:`, finalUrl);
-        window.open(finalUrl, '_blank');
-        
-        if (chosenLink.includes('signal')) {
-          toast.success(
-            `📱 Signal ouvert ! Message copié pour ${serviceName} - collez-le (Ctrl+V)`,
-            { duration: 6000 }
-          );
-        } else {
-          toast.success(
-            `📱 Redirection vers Signal ! Le message est déjà copié pour être collé`,
-            { duration: 4000 }
-          );
-        }
-      } else {
-        // Pas de lien configuré, juste copier
-        toast.success(
-          `📋 Message copié ! Ouvrez Signal et collez votre commande ${serviceName}`,
-          { duration: 6000 }
-        );
-      }
-      
-      // Vider le panier après 2 secondes
+      // Rediriger après un délai pour laisser le temps de lire
       setTimeout(() => {
-        clearCart();
-        setIsOpen(false);
-      }, 2000);
-      
-    } catch (err) {
-      console.error('❌ Erreur copie presse-papiers:', err);
-      
-      // Fallback : rediriger vers Signal sans copie automatique
-      if (chosenLink && chosenLink.trim() !== '') {
         window.open(chosenLink, '_blank');
-        alert(`Voici votre commande à copier-coller dans Signal :\n\n${message}`);
-      } else {
-        alert(`Voici votre commande à copier-coller dans Signal :\n\n${message}`);
-      }
-      
-      toast.success(`📱 Copiez le message affiché et envoyez-le dans Signal !`);
+      }, 2000);
     }
   };
 
@@ -285,85 +228,24 @@ export default function Cart() {
     completeMessage += `Commande depuis le site SCM\n`;
     completeMessage += `Merci de confirmer votre commande !`;
     
-    // Copier le message ET rediriger vers Signal
-    try {
-      await navigator.clipboard.writeText(completeMessage);
-      console.log('📋 Message complet copié:', completeMessage);
+    // Afficher le message complet pour copie manuelle
+    console.log('📋 Message complet généré:', completeMessage);
+    
+    // Stocker le message pour affichage
+    setOrderMessage(completeMessage);
+    
+    // Passer à l'étape d'affichage du message
+    setCurrentStep('message');
+    
+    // Préparer la redirection vers Signal principal
+    let signalLink = orderLink;
+    if (signalLink && signalLink.trim() !== '') {
+      console.log(`📱 Lien Signal principal disponible:`, signalLink);
       
-      // Choisir le lien Signal principal
-      let signalLink = orderLink;
-      
-      // Rediriger vers Signal après avoir copié
-      if (signalLink && signalLink.trim() !== '') {
-        // Encoder le message pour l'URL
-        const encodedMessage = encodeURIComponent(completeMessage);
-        
-        // Construire l'URL Signal
-        let finalUrl = signalLink;
-        
-        // Signal supporte différents formats
-        if (signalLink.includes('signal.me') || signalLink.includes('signal.org') || signalLink.includes('signal://')) {
-          // Pour Signal, on ne peut pas pré-remplir le message dans l'URL
-          // On ouvre juste Signal et on laisse l'utilisateur coller
-          finalUrl = signalLink;
-        } else if (signalLink.includes('wa.me') || signalLink.includes('whatsapp.com')) {
-          // WhatsApp supporte le paramètre text
-          const separator = signalLink.includes('?') ? '&' : '?';
-          finalUrl = `${signalLink}${separator}text=${encodedMessage}`;
-        } else if (signalLink.includes('t.me')) {
-          // Telegram supporte le paramètre text (sauf liens d'invitation)
-          if (signalLink.includes('/+')) {
-            finalUrl = signalLink;
-          } else {
-            const separator = signalLink.includes('?') ? '&' : '?';
-            finalUrl = `${signalLink}${separator}text=${encodedMessage}`;
-          }
-        } else {
-          // Autre lien personnalisé
-          finalUrl = signalLink;
-        }
-        
-        console.log(`📱 Redirection vers Signal avec commande complète:`, finalUrl);
-        window.open(finalUrl, '_blank');
-        
-        if (chosenLink.includes('signal')) {
-          toast.success(
-            `📱 Signal ouvert ! Le message est copié - collez-le (Ctrl+V) dans la conversation`,
-            { duration: 6000 }
-          );
-        } else {
-          toast.success(
-            `📱 Redirection vers Signal ! Le message est déjà copié, collez-le directement`,
-            { duration: 4000 }
-          );
-        }
-      } else {
-        // Pas de lien configuré, juste copier
-        toast.success(
-          '📋 Commande complète copiée ! Ouvrez Signal et collez votre commande',
-          { duration: 6000 }
-        );
-      }
-      
-      // Vider le panier après 2 secondes
+      // Rediriger après un délai pour laisser le temps de copier
       setTimeout(() => {
-        clearCart();
-        setIsOpen(false);
-      }, 2000);
-      
-    } catch (err) {
-      console.error('❌ Erreur copie presse-papiers:', err);
-      
-      // Fallback : rediriger vers Signal sans copie automatique
-      let signalLink = orderLink;
-      if (signalLink && signalLink.trim() !== '') {
         window.open(signalLink, '_blank');
-        alert(`Voici votre commande complète à copier-coller dans Signal :\n\n${completeMessage}`);
-      } else {
-        alert(`Voici votre commande complète à copier-coller dans Signal :\n\n${completeMessage}`);
-      }
-      
-      toast.success('📱 Copiez le message affiché et envoyez-le dans Signal !');
+      }, 3000);
     }
   };
   
@@ -392,6 +274,7 @@ export default function Cart() {
                   {currentStep === 'service' && 'Mode de livraison'}
                   {currentStep === 'schedule' && 'Options & Horaires'}
                   {currentStep === 'review' && 'Récapitulatif'}
+                  {currentStep === 'message' && 'Votre message'}
                 </h2>
                 <span className="rounded-full bg-green-500 px-2 py-1 text-sm font-medium text-black">
                   {totalItems} article{totalItems > 1 ? 's' : ''}
@@ -842,6 +725,75 @@ export default function Cart() {
                       >
                         Modifier services
                       </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Étape message - Affichage du message à copier */}
+                {currentStep === 'message' && (
+                  <div className="space-y-4">
+                    <div className="text-center bg-green-500/10 border border-green-500/20 rounded-lg p-4">
+                      <div className="text-green-400 font-medium mb-2">✅ Commande prête !</div>
+                      <div className="text-sm text-gray-300">
+                        Copiez le message ci-dessous et Signal va s'ouvrir automatiquement
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gray-800 border border-white/20 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-sm font-medium text-gray-300">📋 Message à copier :</span>
+                        <button
+                          onClick={async () => {
+                            try {
+                              await navigator.clipboard.writeText(orderMessage);
+                              toast.success('📋 Message copié !');
+                            } catch (err) {
+                              console.error('Erreur copie:', err);
+                              toast.error('Copiez manuellement le texte ci-dessous');
+                            }
+                          }}
+                          className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs font-medium"
+                        >
+                          📋 Copier
+                        </button>
+                      </div>
+                      
+                      <div className="bg-black rounded-lg p-3 max-h-60 overflow-y-auto">
+                        <pre className="text-sm text-white whitespace-pre-wrap font-mono">
+                          {orderMessage}
+                        </pre>
+                      </div>
+                    </div>
+                    
+                    <div className="text-center space-y-3">
+                      <div className="text-sm text-blue-400">
+                        📱 Signal va s'ouvrir dans 3 secondes...
+                      </div>
+                      
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => {
+                            if (orderLink && orderLink.trim() !== '') {
+                              window.open(orderLink, '_blank');
+                            }
+                          }}
+                          className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg font-medium"
+                        >
+                          📱 Ouvrir Signal maintenant
+                        </button>
+                        
+                        <button
+                          onClick={() => {
+                            clearCart();
+                            setIsOpen(false);
+                            setCurrentStep('cart');
+                            setOrderMessage('');
+                          }}
+                          className="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 px-4 rounded-lg font-medium"
+                        >
+                          ✅ Terminé
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )}
