@@ -31,6 +31,13 @@ export default function MediaUploader({
       return;
     }
 
+    // AUCUNE LIMITE DE DURÉE - VIDÉOS ILLIMITÉES
+    console.log('🎥 Upload vidéo sans limite de durée:', {
+      name: file.name,
+      size: `${Math.round(file.size / 1024 / 1024 * 100) / 100}MB`,
+      type: file.type
+    });
+
     setUploading(true);
     setError('');
 
