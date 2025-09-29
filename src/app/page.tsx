@@ -328,80 +328,16 @@ export default function HomePage() {
                     </p>
                   </div>
                 ) : filteredProducts.length > 0 ? (
-                  selectedFarm === 'Toutes les fermes' ? (
-                    // Affichage groupé par ferme
-                    <div className="space-y-8">
-                      {(() => {
-                        // Grouper les produits par ferme (exclure les produits sans ferme)
-                        const productsByFarm = filteredProducts.reduce((acc: Record<string, typeof filteredProducts>, product) => {
-                          // Ignorer les produits sans ferme assignée
-                          if (!product.farm || product.farm.trim() === '') {
-                            return acc;
-                          }
-                          
-                          const farmName = product.farm;
-                          if (!acc[farmName]) acc[farmName] = [];
-                          acc[farmName].push(product);
-                          return acc;
-                        }, {});
-
-                        const farmGroups = Object.entries(productsByFarm).map(([farmName, farmProducts]) => (
-                          <div key={farmName}>
-                            {/* Header de ferme */}
-                            <div className="flex items-center gap-3 mb-4">
-                              <div className="bg-gradient-to-r from-green-500 to-emerald-500 p-2 rounded-lg">
-                                <span className="text-white text-lg">🏭</span>
-                              </div>
-                              <div>
-                                <h3 className="text-white font-bold text-lg">{farmName}</h3>
-                                <p className="text-gray-400 text-sm">{farmProducts.length} produit{farmProducts.length > 1 ? 's' : ''}</p>
-                              </div>
-                            </div>
-                            
-                            {/* Produits de cette ferme */}
-                            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-                              {farmProducts.map((product) => (
-                                <ProductCard
-                                  key={product._id}
-                                  product={product}
-                                  onClick={() => setSelectedProduct(product)}
-                                />
-                              ))}
-                            </div>
-                          </div>
-                        ));
-
-                        // Ajouter les produits sans ferme à la fin, sans header
-                        const productsWithoutFarm = filteredProducts.filter(product => !product.farm || product.farm.trim() === '');
-                        
-                        return [
-                          ...farmGroups,
-                          ...(productsWithoutFarm.length > 0 ? [
-                            <div key="no-farm" className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-                              {productsWithoutFarm.map((product) => (
-                                <ProductCard
-                                  key={product._id}
-                                  product={product}
-                                  onClick={() => setSelectedProduct(product)}
-                                />
-                              ))}
-                            </div>
-                          ] : [])
-                        ];
-                      })()}
-                    </div>
-                  ) : (
-                    // Affichage normal quand une ferme spécifique est sélectionnée
-                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-                      {filteredProducts.map((product) => (
-                        <ProductCard
-                          key={product._id}
-                          product={product}
-                          onClick={() => setSelectedProduct(product)}
-                        />
-                      ))}
-                    </div>
-                  )
+                  // Affichage normal sans headers - produits triés par ferme
+                  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+                    {filteredProducts.map((product) => (
+                      <ProductCard
+                        key={product._id}
+                        product={product}
+                        onClick={() => setSelectedProduct(product)}
+                      />
+                    ))}
+                  </div>
                 ) : null}
                 </main>
               </div>

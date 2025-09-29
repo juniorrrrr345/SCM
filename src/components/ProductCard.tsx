@@ -6,6 +6,7 @@ interface Product {
   name: string;
   category: string;
   category_icon?: string;
+  farm?: string;
   image_url: string;
   video_url?: string;
   description?: string;
@@ -83,7 +84,11 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
         <h3 className="text-white font-bold text-responsive-xs sm:text-responsive-sm mb-1 uppercase tracking-wide leading-tight break-words line-clamp-2">
           {product.name}
         </h3>
-        <p className="text-gray-400 text-xxs sm:text-xs font-medium uppercase tracking-widest break-words line-clamp-1"/>
+        {product.farm && (
+          <p className="text-green-400 text-xxs sm:text-xs font-medium mb-1 break-words line-clamp-1">
+            {product.farm}
+          </p>
+        )}
         {/* Description du produit avec support Markdown */}
         {product.description && (
           <div className="text-gray-300 text-xxs sm:text-xs mt-2 line-clamp-2 leading-relaxed">

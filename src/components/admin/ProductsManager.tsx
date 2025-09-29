@@ -367,19 +367,26 @@ export default function ProductsManager() {
         return;
       }
 
-      console.log('💾 Sauvegarde produit:', {
-        url,
-        method,
-        dataSizeMB: Math.round(requestSizeMB * 100) / 100,
+    console.log('💾 Sauvegarde produit:', {
+      url,
+      method,
+      dataSizeMB: Math.round(requestSizeMB * 100) / 100,
+      name: cleanedFormData.name,
+      category: cleanedFormData.category,
+      farm: cleanedFormData.farm,
+      farm_id: cleanedFormData.farm_id,
+      bodyToSend: {
         name: cleanedFormData.name,
         category: cleanedFormData.category,
-        farm: cleanedFormData.farm,
-        editingProduct: editingProduct ? { 
-          id: editingProduct._id, 
-          name: editingProduct.name 
-        } : null,
-        isUpdate: !!editingProduct
-      });
+        farm: cleanedFormData.farm
+      },
+      editingProduct: editingProduct ? { 
+        id: editingProduct._id, 
+        name: editingProduct.name,
+        farm: editingProduct.farm
+      } : null,
+      isUpdate: !!editingProduct
+    });
 
       const response = await fetch(url, {
         method,
