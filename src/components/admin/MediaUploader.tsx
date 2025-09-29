@@ -54,21 +54,24 @@ export default function MediaUploader({
           fileName: file.name
         });
         
-        // Alerter si résolution élevée
-        if (video.videoHeight >= 480) {
-          console.warn('⚠️ RÉSOLUTION ÉLEVÉE DÉTECTÉE! Cela pourrait causer des problèmes.');
+        // Alerter SEULEMENT pour les très hautes résolutions (720p+)
+        if (video.videoHeight >= 720) {
+          console.warn('⚠️ TRÈS HAUTE RÉSOLUTION DÉTECTÉE! Cela va probablement échouer.');
           
-          // Afficher un avertissement à l'utilisateur
-          setError(`⚠️ Vidéo haute résolution (${video.videoWidth}x${video.videoHeight}). Si l'upload échoue, réduisez la qualité à 360p ou 240p avant d'uploader.`);
+          // Afficher un avertissement à l'utilisateur pour 720p+
+          setError(`⚠️ Vidéo très haute résolution (${video.videoWidth}x${video.videoHeight}). Risque d'échec d'upload élevé.`);
           
           setTimeout(() => {
-            if (confirm(`Votre vidéo est en ${video.videoWidth}x${video.videoHeight} (haute résolution).\n\nCela peut causer des erreurs d'upload.\n\nVoulez-vous continuer quand même ?`)) {
+            if (confirm(`Votre vidéo est en ${video.videoWidth}x${video.videoHeight} (très haute résolution).\n\nCela va probablement échouer sur le plan gratuit Vercel.\n\nRecommandation: réduisez à 480p max.\n\nVoulez-vous continuer quand même ?`)) {
               setError(''); // Effacer l'avertissement si l'utilisateur veut continuer
             } else {
               setUploading(false);
               return;
             }
           }, 100);
+        } else if (video.videoHeight >= 480) {
+          // Juste un log pour 480p, mais pas de blocage
+          console.log('📱 Résolution 480p détectée - devrait passer avec 2GB RAM');
         }
       };
       
