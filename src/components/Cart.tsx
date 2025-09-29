@@ -170,23 +170,42 @@ export default function Cart() {
         // Construire l'URL Signal
         let finalUrl = chosenLink;
         
-        // Signal supporte différents formats de liens
-        if (chosenLink.includes('signal.me') || chosenLink.includes('signal.org')) {
-          // Lien Signal direct avec message
+        // Signal supporte différents formats
+        if (chosenLink.includes('signal.me') || chosenLink.includes('signal.org') || chosenLink.includes('signal://')) {
+          // Pour Signal, on ne peut pas pré-remplir le message dans l'URL
+          // On ouvre juste Signal et on laisse l'utilisateur coller
+          finalUrl = chosenLink;
+        } else if (chosenLink.includes('wa.me') || chosenLink.includes('whatsapp.com')) {
+          // WhatsApp supporte le paramètre text
           const separator = chosenLink.includes('?') ? '&' : '?';
           finalUrl = `${chosenLink}${separator}text=${encodedMessage}`;
+        } else if (chosenLink.includes('t.me')) {
+          // Telegram supporte le paramètre text (sauf liens d'invitation)
+          if (chosenLink.includes('/+')) {
+            finalUrl = chosenLink;
+          } else {
+            const separator = chosenLink.includes('?') ? '&' : '?';
+            finalUrl = `${chosenLink}${separator}text=${encodedMessage}`;
+          }
         } else {
-          // Autre format de lien Signal ou lien personnalisé
+          // Autre lien personnalisé
           finalUrl = chosenLink;
         }
         
         console.log(`📱 Redirection vers Signal:`, finalUrl);
         window.open(finalUrl, '_blank');
         
-        toast.success(
-          `📱 Redirection vers Signal ! Le message est déjà copié pour être collé`,
-          { duration: 4000 }
-        );
+        if (chosenLink.includes('signal')) {
+          toast.success(
+            `📱 Signal ouvert ! Message copié pour ${serviceName} - collez-le (Ctrl+V)`,
+            { duration: 6000 }
+          );
+        } else {
+          toast.success(
+            `📱 Redirection vers Signal ! Le message est déjà copié pour être collé`,
+            { duration: 4000 }
+          );
+        }
       } else {
         // Pas de lien configuré, juste copier
         toast.success(
@@ -282,23 +301,42 @@ export default function Cart() {
         // Construire l'URL Signal
         let finalUrl = signalLink;
         
-        // Signal supporte différents formats de liens
-        if (signalLink.includes('signal.me') || signalLink.includes('signal.org')) {
-          // Lien Signal direct avec message
+        // Signal supporte différents formats
+        if (signalLink.includes('signal.me') || signalLink.includes('signal.org') || signalLink.includes('signal://')) {
+          // Pour Signal, on ne peut pas pré-remplir le message dans l'URL
+          // On ouvre juste Signal et on laisse l'utilisateur coller
+          finalUrl = signalLink;
+        } else if (signalLink.includes('wa.me') || signalLink.includes('whatsapp.com')) {
+          // WhatsApp supporte le paramètre text
           const separator = signalLink.includes('?') ? '&' : '?';
           finalUrl = `${signalLink}${separator}text=${encodedMessage}`;
+        } else if (signalLink.includes('t.me')) {
+          // Telegram supporte le paramètre text (sauf liens d'invitation)
+          if (signalLink.includes('/+')) {
+            finalUrl = signalLink;
+          } else {
+            const separator = signalLink.includes('?') ? '&' : '?';
+            finalUrl = `${signalLink}${separator}text=${encodedMessage}`;
+          }
         } else {
-          // Autre format de lien Signal ou lien personnalisé
+          // Autre lien personnalisé
           finalUrl = signalLink;
         }
         
         console.log(`📱 Redirection vers Signal avec commande complète:`, finalUrl);
         window.open(finalUrl, '_blank');
         
-        toast.success(
-          `📱 Redirection vers Signal ! Le message est déjà copié, collez-le directement`,
-          { duration: 4000 }
-        );
+        if (chosenLink.includes('signal')) {
+          toast.success(
+            `📱 Signal ouvert ! Le message est copié - collez-le (Ctrl+V) dans la conversation`,
+            { duration: 6000 }
+          );
+        } else {
+          toast.success(
+            `📱 Redirection vers Signal ! Le message est déjà copié, collez-le directement`,
+            { duration: 4000 }
+          );
+        }
       } else {
         // Pas de lien configuré, juste copier
         toast.success(

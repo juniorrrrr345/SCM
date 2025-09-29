@@ -231,7 +231,7 @@ export default function SettingsManager() {
                 value={settings.whatsappLink}
                 onChange={(e) => updateField('whatsappLink', e.target.value)}
                 className="w-full bg-gray-800 border border-white/20 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-white"
-                placeholder="https://wa.me/33612345678 ou https://t.me/username ou https://instagram.com/username"
+                placeholder="https://signal.me/#eu/votre-lien ou https://wa.me/33612345678"
               />
               <p className="text-xs text-gray-400 mt-1">
                 Lien principal de commande (WhatsApp, Signal, Telegram, etc.)
@@ -283,8 +283,11 @@ export default function SettingsManager() {
               
               <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
                 <p className="text-xs text-blue-400">
-                  💡 <strong>Astuce :</strong> Si configurés, ces liens spécifiques seront utilisés pour chaque service. 
-                  Sinon, le lien principal sera utilisé pour tous.
+                  💡 <strong>Signal - Formats de liens :</strong><br/>
+                  • <code>https://signal.me/#eu/VotreLien</code> - Lien de groupe/conversation<br/>
+                  • <code>signal://user/VotreNumero</code> - Message privé<br/>
+                  • <code>signal://contact/VotreID</code> - Contact direct<br/><br/>
+                  Si configurés, ces liens spécifiques remplacent le lien principal pour chaque service.
                 </p>
               </div>
             </div>
