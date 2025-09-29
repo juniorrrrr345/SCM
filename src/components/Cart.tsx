@@ -36,6 +36,7 @@ export default function Cart() {
   });
   const [currentStep, setCurrentStep] = useState<'cart' | 'service' | 'schedule' | 'review' | 'message'>('cart');
   const [orderMessage, setOrderMessage] = useState('');
+  const [messageCopied, setMessageCopied] = useState(false);
   
   // Auto-navigation entre les étapes (désactivée pour permettre la modification)
   useEffect(() => {
@@ -166,6 +167,7 @@ export default function Cart() {
     
     // Passer à l'étape d'affichage du message
     setCurrentStep('message');
+    setMessageCopied(false); // Reset du statut de copie
     
     // Stocker le lien Signal pour bouton manuel (pas de redirection auto)
     console.log(`📱 Lien Signal disponible pour bouton manuel:`, chosenLink);
@@ -229,6 +231,7 @@ export default function Cart() {
     
     // Passer à l'étape d'affichage du message
     setCurrentStep('message');
+    setMessageCopied(false); // Reset du statut de copie
     
     // Stocker le lien Signal principal pour bouton manuel
     console.log(`📱 Lien Signal principal disponible pour bouton manuel:`, orderLink);
@@ -300,7 +303,7 @@ export default function Cart() {
           </div>
           
           {/* Content dynamique selon l'étape */}
-          <div className="flex-1 overflow-y-auto p-6">
+          <div className={`flex-1 overflow-y-auto ${currentStep === 'message' ? 'p-3' : 'p-6'}`}>
             {items.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-gray-400">
                 <ShoppingCart className="h-16 w-16 mb-4" />
@@ -714,98 +717,86 @@ export default function Cart() {
                   </div>
                 )}
 
-                {/* Étape message - Affichage du message à copier */}
+                {/* Étape message - Interface mobile optimisée */}
                 {currentStep === 'message' && (
-                  <div className="space-y-4">
-                    <div className="text-center bg-green-500/10 border border-green-500/20 rounded-lg p-4">
-                      <div className="text-green-400 font-medium mb-2">✅ Commande prête !</div>
-                      <div className="text-sm text-gray-300">
-                        Copiez le message et cliquez pour ouvrir Signal manuellement
+                  <div className="h-full flex flex-col">
+                    {/* Header fixe */}
+                    <div className="text-center bg-green-500/10 border border-green-500/20 rounded-lg p-3 mb-4">
+                      <div className="text-green-400 font-medium mb-1">✅ Commande prête !</div>
+                      <div className="text-xs text-gray-300">
+                        Copiez votre message pour Signal
                       </div>
-                      {orderLink && (
-                        <div className="text-xs text-blue-400 mt-2 bg-blue-500/10 p-2 rounded border border-blue-500/20">
-                          📱 Signal configuré : {orderLink.substring(0, 50)}...
-                        </div>
-                      )}
                     </div>
                     
-                    <div className="bg-gray-800 border border-white/20 rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-sm font-medium text-gray-300">📋 Message à copier :</span>
+                    {/* Message scrollable - prend tout l'espace disponible */}
+                    <div className="flex-1 bg-gray-800 border border-white/20 rounded-lg p-3 mb-4 flex flex-col">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-medium text-gray-300">📋 Votre commande :</span>
                         <button
                           onClick={async () => {
                             try {
                               await navigator.clipboard.writeText(orderMessage);
+                              setMessageCopied(true);
                               toast.success('📋 Message copié !');
                             } catch (err) {
                               console.error('Erreur copie:', err);
-                              toast.error('Copiez manuellement le texte ci-dessous');
+                              toast.error('Utilisez la sélection manuelle');
                             }
                           }}
-                          className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs font-medium"
+                          className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs font-medium"
                         >
                           📋 Copier
                         </button>
                       </div>
                       
-                      <div className="bg-black rounded-lg p-3 max-h-60 overflow-y-auto">
-                        <pre className="text-sm text-white whitespace-pre-wrap font-mono">
+                      {/* Message dans une zone scrollable qui s'adapte */}
+                      <div className="flex-1 bg-black rounded-lg p-3 overflow-y-auto min-h-0">
+                        <div className="text-sm text-white whitespace-pre-wrap font-mono leading-relaxed select-all">
                           {orderMessage}
-                        </pre>
+                        </div>
                       </div>
                     </div>
                     
-                    <div className="text-center space-y-3">
-                      <div className="text-sm text-blue-400 bg-blue-500/10 p-3 rounded-lg">
-                        📋 <strong>Étapes :</strong><br/>
-                        1. Copiez le message ci-dessus<br/>
-                        2. Cliquez "Ouvrir Signal"<br/>
-                        3. Collez le message dans la conversation
-                      </div>
-                      
-                      <div className="flex gap-3">
+                    {/* Bouton Commander fixe en bas */}
+                    {messageCopied ? (
+                      <div className="space-y-3">
+                        <div className="text-center text-green-400 text-sm font-medium">
+                          ✅ Message copié ! Cliquez Commander pour ouvrir Signal
+                        </div>
                         <button
                           onClick={() => {
                             if (orderLink && orderLink.trim() !== '') {
                               try {
-                                console.log('📱 Tentative ouverture Signal:', orderLink);
+                                console.log('📱 Ouverture Signal:', orderLink);
                                 window.open(orderLink, '_blank');
-                                toast.success('📱 Signal ouvert ! Collez votre message dans la conversation');
+                                toast.success('📱 Signal ouvert ! Collez votre message');
+                                
+                                // Vider le panier après ouverture réussie
+                                setTimeout(() => {
+                                  clearCart();
+                                  setIsOpen(false);
+                                  setCurrentStep('cart');
+                                  setOrderMessage('');
+                                  setMessageCopied(false);
+                                }, 1000);
                               } catch (error) {
                                 console.error('❌ Erreur ouverture Signal:', error);
-                                toast.error('❌ Erreur ouverture Signal. Copiez le lien manuellement.');
-                                
-                                // Fallback : copier le lien
-                                try {
-                                  navigator.clipboard.writeText(orderLink);
-                                  toast.success('🔗 Lien Signal copié ! Ouvrez-le manuellement');
-                                } catch (e) {
-                                  console.error('Erreur copie lien:', e);
-                                }
+                                toast.error('❌ Impossible d\'ouvrir Signal automatiquement');
                               }
                             } else {
-                              toast.error('❌ Aucun lien Signal configuré dans Settings');
+                              toast.error('❌ Aucun lien Signal configuré');
                             }
                           }}
-                          className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg font-medium"
+                          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-4 px-6 rounded-lg font-bold text-lg"
                         >
-                          📱 Ouvrir Signal
-                        </button>
-                        
-                        <button
-                          onClick={() => {
-                            clearCart();
-                            setIsOpen(false);
-                            setCurrentStep('cart');
-                            setOrderMessage('');
-                            toast.success('🛒 Commande terminée !');
-                          }}
-                          className="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 px-4 rounded-lg font-medium"
-                        >
-                          ✅ Terminé
+                          📱 COMMANDER SUR SIGNAL
                         </button>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="text-center text-gray-400 text-sm">
+                        👆 Copiez d'abord le message ci-dessus
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
