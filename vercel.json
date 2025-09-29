@@ -1,0 +1,54 @@
+{
+  "functions": {
+    "src/app/api/products/route.ts": {
+      "maxDuration": 30,
+      "memory": 1024
+    },
+    "src/app/api/products/[id]/route.ts": {
+      "maxDuration": 30,
+      "memory": 1024
+    },
+    "src/app/api/upload/route.ts": {
+      "maxDuration": 30,
+      "memory": 1024
+    }
+  },
+  "regions": ["iad1"],
+  "framework": "nextjs",
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Vercel-Protection-Bypass",
+          "value": "true"
+        }
+      ]
+    }
+  ],
+  "git": {
+    "deploymentEnabled": {
+      "main": true,
+      "master": false,
+      "production": false,
+      "deploy": false,
+      "cursor/*": false,
+      "cursor/**": false,
+      "*": false,
+      "**": false
+    }
+  },
+  "github": {
+    "enabled": false,
+    "silent": true
+  },
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "installCommand": "npm install",
+  "devCommand": "npm run dev",
+  "ignoreCommand": "git branch --show-current | grep -E '^cursor/' && exit 0 || exit 1"
+}

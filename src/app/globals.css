@@ -1,0 +1,632 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Empêcher le glissement indésirable sur mobile */
+.overscroll-contain {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Désactiver le pull-to-refresh sur mobile */
+body {
+  overscroll-behavior-y: none;
+}
+
+/* Cacher la scrollbar tout en gardant le scroll */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
+
+/* Animations personnalisées */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.3s ease-out;
+}
+
+/* Animation pour le spinner inversé */
+@keyframes spin-reverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+.animate-spin-reverse {
+  animation: spin-reverse 1.5s linear infinite;
+}
+
+/* Animation gradient pour le titre */
+@keyframes gradient {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient 3s ease infinite;
+}
+
+/* Animation delay utilities */
+.animation-delay-1000 {
+  animation-delay: 1000ms;
+}
+
+/* Animation de la barre de chargement */
+@keyframes loading-bar {
+  0% {
+    width: 0%;
+    transform: translateX(0);
+  }
+  50% {
+    width: 100%;
+    transform: translateX(0);
+  }
+  100% {
+    width: 100%;
+    transform: translateX(100%);
+  }
+}
+
+.animate-loading-bar {
+  animation: loading-bar 1.5s ease-in-out infinite;
+}
+
+/* Animation fade-in pour le chargement */
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 1s ease-out forwards;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Metal+Mania&display=swap');
+
+/* Reset et base responsive */
+* {
+  box-sizing: border-box;
+}
+
+/* Support des safe areas pour les appareils iOS */
+:root {
+  --safe-area-inset-top: env(safe-area-inset-top);
+  --safe-area-inset-right: env(safe-area-inset-right);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom);
+  --safe-area-inset-left: env(safe-area-inset-left);
+}
+
+/* Scrollbar personnalisé professionnel */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #4B5563 #1F2937;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #1F2937;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #4B5563;
+  border-radius: 3px;
+  transition: background 0.3s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #6B7280;
+}
+
+/* Amélioration du scroll tactile pour les pages modales */
+.modal-scroll-container {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
+  touch-action: pan-y;
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+.modal-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+.modal-scroll-container {
+  scrollbar-width: none;
+}
+
+/* Optimisation pour le scroll tactile sur mobile */
+@media (max-width: 768px) {
+  .modal-scroll-container {
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    overscroll-behavior-y: contain;
+  }
+  
+  /* Amélioration spécifique pour les pages modales */
+  .fixed.inset-0.overflow-y-auto {
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    overscroll-behavior-y: contain;
+  }
+}
+
+/* Fix pour éviter que le BottomNav disparaisse lors du swipe */
+.bottom-nav-container {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 40 !important;
+  pointer-events: auto !important;
+  touch-action: manipulation !important;
+  -webkit-transform: translateZ(0) !important;
+  transform: translateZ(0) !important;
+  will-change: auto !important;
+  /* Empêcher le flou de l'overlay global */
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Amélioration pour les conteneurs de page avec BottomNav */
+.page-with-bottom-nav {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  overflow: hidden !important;
+}
+
+.page-content-scrollable {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: contain !important;
+  touch-action: pan-y !important;
+  padding-bottom: 100px !important; /* Espace pour BottomNav */
+}
+
+/* Prévention du scroll de body quand une page modal est ouverte */
+.modal-open {
+  overflow: hidden !important;
+  touch-action: none !important;
+}
+
+/* Background global robuste - optimisé responsive */
+html {
+  background-color: black !important;
+  background-attachment: fixed !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  min-height: 100%;
+  /* Amélioration mobile */
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: black !important;
+  background-attachment: fixed !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  min-height: 100vh;
+  min-height: 100dvh; /* Support pour les nouveaux navigateurs */
+  /* Prévention du scroll horizontal */
+  overflow-x: hidden;
+  /* Support des safe areas */
+  padding-top: var(--safe-area-inset-top);
+  padding-bottom: var(--safe-area-inset-bottom);
+  padding-left: var(--safe-area-inset-left);
+  padding-right: var(--safe-area-inset-right);
+}
+
+/* Conteneur principal - optimisé responsive */
+.main-container {
+  background-color: black;
+  background-attachment: local; /* Changé pour mobile */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  min-height: 100dvh;
+  position: relative;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Couche d'overlay globale - optimisée */
+.global-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-color: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(2px);
+  /* Amélioration performance mobile */
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Contenu principal par-dessus l'overlay */
+.content-layer {
+  position: relative;
+  z-index: 10;
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+}
+
+/* Titre responsive avec clamp */
+.shop-title {
+  font-weight: 900;
+  font-size: clamp(1.5rem, 5vw, 2.5rem); /* Responsive font size */
+  color: white;
+  text-shadow: 
+    2px 2px 0px #000,
+    4px 4px 0px rgba(0,0,0,0.5),
+    6px 6px 10px rgba(0,0,0,0.3);
+  letter-spacing: 0.1em;
+  position: relative;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.shop-title::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, white, transparent);
+}
+
+/* Style Graffiti responsive */
+.graffiti-text {
+  font-family: 'Metal Mania', cursive;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: clamp(1rem, 4vw, 2rem); /* Responsive */
+  background: linear-gradient(
+    45deg,
+    #ff0000,
+    #ffff00,
+    #00ff00,
+    #0000ff,
+    #8000ff,
+    #ff0000
+  );
+  background-size: 400% 400%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientShift 3s ease-in-out infinite, textGlow 2s ease-in-out infinite alternate;
+  text-shadow: 
+    3px 3px 0px rgba(0,0,0,0.8),
+    6px 6px 0px rgba(0,0,0,0.6),
+    9px 9px 0px rgba(0,0,0,0.4),
+    12px 12px 20px rgba(0,0,0,0.3);
+  position: relative;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.graffiti-text::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    #ff0000,
+    #ffff00,
+    #00ff00,
+    #0000ff,
+    #8000ff,
+    #ff0000
+  );
+  background-size: 200% 100%;
+  animation: gradientShift 2s linear infinite;
+  border-radius: 2px;
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes textGlow {
+  0% {
+    filter: drop-shadow(0 0 5px rgba(255,255,255,0.3));
+  }
+  100% {
+    filter: drop-shadow(0 0 20px rgba(255,255,255,0.8)) drop-shadow(0 0 30px rgba(255,255,0,0.5));
+  }
+}
+
+/* Animation pour le texte défilant - optimisée mobile */
+@keyframes marquee {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 20s linear infinite;
+  display: inline-block;
+  /* Optimisation performance */
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Utilities responsive */
+@layer utilities {
+  .text-responsive-xs {
+    font-size: clamp(0.75rem, 2vw, 0.875rem);
+  }
+  
+  .text-responsive-sm {
+    font-size: clamp(0.875rem, 2.5vw, 1rem);
+  }
+  
+  .text-responsive-base {
+    font-size: clamp(1rem, 3vw, 1.125rem);
+  }
+  
+  .text-responsive-lg {
+    font-size: clamp(1.125rem, 3.5vw, 1.25rem);
+  }
+  
+  .text-responsive-xl {
+    font-size: clamp(1.25rem, 4vw, 1.5rem);
+  }
+  
+  .text-responsive-2xl {
+    font-size: clamp(1.5rem, 5vw, 2rem);
+  }
+  
+  .text-responsive-3xl {
+    font-size: clamp(1.875rem, 6vw, 2.5rem);
+  }
+
+  .aspect-square {
+    aspect-ratio: 1 / 1;
+  }
+  
+  .aspect-video {
+    aspect-ratio: 16 / 9;
+  }
+  
+  .aspect-photo {
+    aspect-ratio: 4 / 3;
+  }
+  
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+  
+  .safe-area-padding {
+    padding-top: var(--safe-area-inset-top);
+    padding-bottom: var(--safe-area-inset-bottom);
+    padding-left: var(--safe-area-inset-left);
+    padding-right: var(--safe-area-inset-right);
+  }
+
+  /* Line clamp utilities */
+  .line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+  
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+  
+  .line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  /* Line height utilities */
+  .line-height-tight {
+    line-height: 1.1;
+  }
+  
+  .line-height-normal {
+    line-height: 1.5;
+  }
+  
+  .line-height-relaxed {
+    line-height: 1.625;
+  }
+}
+
+/* Amélioration performance mobile */
+.scroll-smooth {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Fix pour le scroll horizontal sur mobile */
+.prevent-horizontal-scroll {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Support pour les écrans avec notch */
+@media screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+  body {
+    padding-top: 44px; /* iPhone X safe area */
+    padding-bottom: 34px;
+  }
+}
+
+/* Optimisations mobile supplémentaires */
+@media (max-width: 767px) {
+  /* Force la taille des images à rester proportionnelle */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* Améliore les interactions tactiles */
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Prévention du zoom sur les inputs */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Amélioration pour les tablettes */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .grid-responsive-tablet {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+}
+
+/* Optimisations desktop */
+@media (min-width: 1024px) {
+  /* Hover effects uniquement sur desktop */
+  .hover-desktop:hover {
+    transform: scale(1.05);
+  }
+}
+
+/* Container principal avec fond */
+.main-container {
+  @apply min-h-screen relative;
+  background-color: black;
+  background-image: var(--bg-image, none);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+/* Overlay global pour l'opacité et le blur */
+.global-overlay {
+  @apply fixed inset-0 z-0;
+  background-color: rgba(0, 0, 0, var(--bg-opacity, 0.2));
+  backdrop-filter: blur(var(--bg-blur, 5px));
+  pointer-events: none;
+}
+
+/* Layer de contenu */
+.content-layer {
+  @apply relative z-10;
+}
+
+/* Fond global au niveau du body et html */
+html, body {
+  background-color: black;
+  background-image: var(--bg-image, none);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+}
+
+/* Nouvelles animations pour le style de chargement */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+.animate-shimmer {
+  animation: shimmer 1.5s ease-in-out infinite;
+}
