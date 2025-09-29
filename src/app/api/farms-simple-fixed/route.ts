@@ -1,0 +1,43 @@
+import { NextResponse } from 'next/server';
+
+export async function GET() {
+  try {
+    // Utiliser les valeurs hardcodées pour éviter les problèmes d'env
+    const ACCOUNT_ID = '7979421604bd07b3bd34d3ed96222512';
+    const DATABASE_ID = '6df2df23-06af-4494-ba0f-30b2061c1def';
+    const API_TOKEN = 'ijkVhaXCw6LSddIMIMxwPL5CDAWznxip5x9I1bNW';
+    
+    const baseUrl = `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/d1/database/${DATABASE_ID}/query`;
+    
+    const response = await fetch(baseUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${API_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        sql: 'SELECT id, name, description, location, contact, created_at FROM farms ORDER BY name ASC'
+      })
+    });
+    
+    const responseText = await response.text();
+    console.log('Response status:', response.status);
+    console.log('Response text:', responseText);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${responseText}`);
+    }
+    
+    const data = JSON.parse(responseText);
+    
+    if (data.success && data.result?.[0]?.results) {
+      return NextResponse.json(data.result[0].results);
+    } else {
+      console.log('No results found, returning empty array');
+      return NextResponse.json([]);
+    }
+  } catch (error) {
+    console.error('❌ Erreur API farms (fixed):', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}

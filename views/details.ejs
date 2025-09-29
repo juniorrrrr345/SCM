@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HASHTAG BOT - Black Farm</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #8B0000 100%);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.9);
+            position: relative;
+        }
+
+        .time {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .status-icons {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .signal-dots {
+            display: flex;
+            gap: 2px;
+        }
+
+        .dot {
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .wifi, .battery {
+            font-size: 14px;
+            margin-left: 5px;
+        }
+
+        .battery {
+            background: white;
+            color: black;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .top-section {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .app-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .app-subtitle {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .fermer-btn {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            color: #6366f1;
+            font-size: 14px;
+        }
+
+        .menu-btn {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            color: #888;
+            font-size: 18px;
+        }
+
+        .envoie-banner {
+            background: #ef4444;
+            color: white;
+            text-align: center;
+            padding: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .main-content {
+            padding: 0 20px;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            font-size: 16px;
+            margin-bottom: 20px;
+            text-decoration: none;
+        }
+
+        .back-btn::before {
+            content: "←";
+            font-size: 20px;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .hashtag-logo {
+            width: 120px;
+            height: 120px;
+            background: #333;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #666;
+            font-size: 48px;
+            font-weight: bold;
+        }
+
+        .product-section {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .product-title {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .product-tag {
+            background: #333;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .skull-icon {
+            font-size: 14px;
+        }
+
+        .product-varieties {
+            margin-bottom: 20px;
+        }
+
+        .variety {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .variety-dot {
+            width: 8px;
+            height: 8px;
+            background: #3b82f6;
+            border-radius: 50%;
+        }
+
+        .product-description {
+            color: #888;
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 25px;
+        }
+
+        .price-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .price-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 15px 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .price-card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+        }
+
+        .price-weight {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .price-amount {
+            font-size: 18px;
+            font-weight: 700;
+            color: #3b82f6;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .action-btn {
+            background: #0ea5e9;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .action-btn.snapchat {
+            background: #ffeb3b;
+            color: black;
+        }
+
+        .action-btn:hover {
+            opacity: 0.9;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            border-top: 1px solid #333;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            color: #888;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .nav-item.active {
+            color: #3b82f6;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        .background-overlay {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: linear-gradient(to top, #8B0000, transparent);
+            z-index: -1;
+        }
+
+        .hashtag-text {
+            position: fixed;
+            bottom: 100px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 48px;
+            font-weight: 900;
+            color: rgba(139, 0, 0, 0.3);
+            letter-spacing: 10px;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Background overlay -->
+    <div class="background-overlay"></div>
+    <div class="hashtag-text">HASHTAG</div>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="time">01:48</div>
+        <div class="status-icons">
+            <div class="signal-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+            <div class="wifi">📶</div>
+            <div class="battery">49</div>
+        </div>
+    </div>
+
+    <!-- Top section -->
+    <div class="top-section">
+        <div class="fermer-btn">Fermer</div>
+        <h1 class="app-title">HASHTAG BOT #🔧</h1>
+        <p class="app-subtitle">mini-application</p>
+        <div class="menu-btn">⋯</div>
+    </div>
+
+    <!-- Envoie banner -->
+    <div class="envoie-banner">ENVOIE O</div>
+
+    <!-- Main content -->
+    <div class="main-content">
+        <a href="#" class="back-btn">Retour</a>
+
+        <!-- Logo -->
+        <div class="logo-container">
+            <div class="hashtag-logo">
+                ##
+            </div>
+        </div>
+
+        <!-- Product section -->
+        <div class="product-section">
+            <div class="product-header">
+                <h2 class="product-title">Black Farm</h2>
+                <div class="product-tag">
+                    DRY-SIFT 90U 🅰️🅰️
+                    <span class="skull-icon">☠️</span>
+                </div>
+            </div>
+
+            <div class="product-varieties">
+                <div class="variety">
+                    <div class="variety-dot"></div>
+                    <span>Orangeade 🍊</span>
+                </div>
+                <div class="variety">
+                    <div class="variety-dot"></div>
+                    <span>Lemon Cherry Gelato 🍋🍒</span>
+                </div>
+            </div>
+
+            <div class="product-description">
+                90u feu feu top farm ☠️⚱️🔥<br>
+                Curage au top, terpenes de fou 🤩
+            </div>
+
+            <div class="price-grid">
+                <div class="price-card">
+                    <div class="price-weight">25g</div>
+                    <div class="price-amount">150€</div>
+                </div>
+                <div class="price-card">
+                    <div class="price-weight">50g</div>
+                    <div class="price-amount">250€</div>
+                </div>
+                <div class="price-card">
+                    <div class="price-weight">100g</div>
+                    <div class="price-amount">450€</div>
+                </div>
+                <div class="price-card">
+                    <div class="price-weight">200g</div>
+                    <div class="price-amount">800€</div>
+                </div>
+                <div class="price-card">
+                    <div class="price-weight">500g</div>
+                    <div class="price-amount">1750€</div>
+                </div>
+                <div class="price-card">
+                    <div class="price-weight">1000g</div>
+                    <div class="price-amount">3400€</div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-btn">
+                    ✈️ COMMANDER VIA TELEGRAM
+                </button>
+                <button class="action-btn snapchat">
+                    👻 COMMANDER VIA SNAPCHAT
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom navigation -->
+    <div class="bottom-nav">
+        <a href="#" class="nav-item active">
+            <div class="nav-icon">🏠</div>
+            <div>Menu</div>
+        </a>
+        <a href="#" class="nav-item">
+            <div class="nav-icon">⭐</div>
+            <div>Pack Promo</div>
+        </a>
+        <a href="#" class="nav-item">
+            <div class="nav-icon">ℹ️</div>
+            <div>Infos</div>
+        </a>
+        <a href="#" class="nav-item">
+            <div class="nav-icon">✈️</div>
+            <div>Canal</div>
+        </a>
+        <a href="#" class="nav-item">
+            <div class="nav-icon">✉️</div>
+            <div>Contact</div>
+        </a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,15 @@
+# Ignorer les branches de Cursor
+cursor/*
+**/cursor-*
+
+# Fichiers de développement
+.env.local
+.env.development
+
+# Logs
+logs
+*.log
+
+# Dossiers temporaires
+tmp/
+temp/

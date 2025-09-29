@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin - BROLY69</title>
+</head>
+<body>
+  <h1>Panneau Admin</h1>
+  <form action="/admin/add" method="POST" enctype="multipart/form-data">
+    <input name="name" placeholder="Nom" required><br>
+    <textarea name="description" placeholder="Description" required></textarea><br>
+    <textarea name="prices" placeholder="Ex: 5g:60\n10g:120" required></textarea><br>
+    <input type="file" name="media" required><br>
+    <button type="submit">Ajouter</button>
+  </form>
+</body>
+</html>
