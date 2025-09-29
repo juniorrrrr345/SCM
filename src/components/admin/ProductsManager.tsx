@@ -367,6 +367,36 @@ export default function ProductsManager() {
         return;
       }
 
+      // Validation préventive des URLs pour éviter l'erreur pattern
+      if (cleanedFormData.video_url && cleanedFormData.video_url.trim()) {
+        const videoUrl = cleanedFormData.video_url.trim();
+        // Vérifier que l'URL est valide
+        try {
+          new URL(videoUrl);
+        } catch {
+          alert('URL vidéo invalide. Veuillez entrer une URL complète (ex: https://example.com/video.mp4)');
+          return;
+        }
+        
+        // Vérifier qu'il n'y a pas de caractères qui pourraient poser problème
+        if (/[<>"'`\n\r\t]/.test(videoUrl)) {
+          alert('L\'URL vidéo contient des caractères non autorisés. Veuillez utiliser une URL propre.');
+          return;
+        }
+      }
+
+      // Validation du nom du produit
+      if (!cleanedFormData.name || cleanedFormData.name.trim().length === 0) {
+        alert('Le nom du produit est requis');
+        return;
+      }
+
+      // Nettoyer les chaînes pour éviter les problèmes de pattern
+      cleanedFormData.name = cleanedFormData.name.trim();
+      if (cleanedFormData.description) {
+        cleanedFormData.description = cleanedFormData.description.trim();
+      }
+
     console.log('💾 Sauvegarde produit:', {
       url,
       method,
@@ -468,8 +498,26 @@ export default function ProductsManager() {
         }, 3000);
       }
     } catch (error) {
-      console.error('Erreur:', error);
-      alert('Erreur lors de la sauvegarde');
+      console.error('❌ Erreur lors de la sauvegarde:', error);
+      console.error('📊 Données envoyées:', cleanedFormData);
+      
+      // Gestion spécifique de l'erreur pattern
+      let errorMessage = 'Erreur lors de la sauvegarde';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        
+        // Si c'est l'erreur pattern, donner plus de contexte
+        if (errorMessage.includes('string did not match the expected pattern')) {
+          errorMessage = 'Erreur de validation des données. Vérifiez que toutes les URLs sont valides et que les champs ne contiennent pas de caractères spéciaux.';
+          console.error('🔍 Erreur pattern détectée. URLs à vérifier:', {
+            image_url: cleanedFormData.image_url,
+            video_url: cleanedFormData.video_url,
+            name: cleanedFormData.name
+          });
+        }
+      }
+      
+      alert(errorMessage);
     } finally {
       setIsSaving(false);
     }
