@@ -771,29 +771,66 @@ export default function Cart() {
                           onClick={() => {
                             if (orderLink && orderLink.trim() !== '') {
                               try {
-                                console.log('📱 Ouverture Signal:', orderLink);
-                                window.open(orderLink, '_blank');
+                                console.log('📱 Tentative ouverture Signal:', orderLink);
+                                
+                                // Méthode d'ouverture compatible avec Signal
+                                if (navigator.userAgent.includes('Mobile')) {
+                                  // Mobile : redirection directe pour éviter les blocages
+                                  window.location.href = orderLink;
+                                } else {
+                                  // Desktop : nouvel onglet
+                                  const newWindow = window.open(orderLink, '_blank', 'noopener,noreferrer');
+                                  if (!newWindow) {
+                                    // Si popup bloquée, redirection directe
+                                    window.location.href = orderLink;
+                                  }
+                                }
+                                
+                                console.log('✅ Signal ouvert avec méthode adaptée');
                                 toast.success('📱 Signal ouvert ! Collez votre message');
                                 
-                                // Vider le panier
+                                // Vider le panier après ouverture
                                 setTimeout(() => {
                                   clearCart();
                                   setIsOpen(false);
                                   setCurrentStep('cart');
                                   setOrderMessage('');
                                   setMessageCopied(false);
-                                }, 1000);
+                                }, 1500);
                               } catch (error) {
                                 console.error('❌ Erreur ouverture Signal:', error);
-                                toast.error('❌ Impossible d\'ouvrir Signal');
+                                
+                                // Fallback : copier le lien
+                                try {
+                                  navigator.clipboard.writeText(orderLink);
+                                  toast.error('❌ Ouverture automatique échouée. Lien Signal copié - ouvrez-le manuellement');
+                                } catch (e) {
+                                  toast.error('❌ Erreur. Copiez ce lien manuellement : ' + orderLink.substring(0, 30) + '...');
+                                }
                               }
                             } else {
-                              toast.error('❌ Aucun lien Signal configuré');
+                              toast.error('❌ Aucun lien Signal configuré dans Settings');
                             }
                           }}
                           className="w-full rounded-lg bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 py-4 font-bold text-white transition-all text-lg shadow-xl animate-pulse border-2 border-green-400"
                         >
                           📱 COMMANDER SUR SIGNAL
+                        </button>
+                        
+                        {/* Bouton de fallback pour copier le lien */}
+                        <button
+                          onClick={async () => {
+                            try {
+                              await navigator.clipboard.writeText(orderLink);
+                              toast.success('🔗 Lien Signal copié ! Ouvrez-le dans votre navigateur');
+                            } catch (err) {
+                              console.error('Erreur copie lien:', err);
+                              toast.error('Lien : ' + orderLink);
+                            }
+                          }}
+                          className="w-full rounded-lg bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 text-sm font-medium"
+                        >
+                          🔗 Si ça ne marche pas, copier le lien Signal
                         </button>
                         
                         {/* Espace de sécurité mobile */}
