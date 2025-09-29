@@ -728,85 +728,96 @@ export default function Cart() {
                       </div>
                     </div>
                     
-                    {/* Message scrollable - prend tout l'espace disponible */}
+                    {/* Message complet - optimisé mobile */}
                     <div className="flex-1 bg-gray-800 border border-white/20 rounded-lg p-3 mb-4 flex flex-col">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-medium text-gray-300">📋 Votre commande :</span>
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-sm font-medium text-gray-300">📋 Votre commande :</span>
                         <button
                           onClick={async () => {
                             try {
                               await navigator.clipboard.writeText(orderMessage);
                               setMessageCopied(true);
-                              toast.success('📋 Message copié !');
+                              toast.success('📋 Message copié ! Bouton Commander disponible en bas');
                             } catch (err) {
                               console.error('Erreur copie:', err);
-                              toast.error('Utilisez la sélection manuelle');
+                              toast.error('Sélectionnez et copiez manuellement le texte');
                             }
                           }}
-                          className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs font-medium"
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                            messageCopied 
+                              ? 'bg-green-500 text-white' 
+                              : 'bg-blue-500 hover:bg-blue-600 text-white'
+                          }`}
                         >
-                          📋 Copier
+                          {messageCopied ? '✅ Copié' : '📋 Copier'}
                         </button>
                       </div>
                       
-                      {/* Message dans une zone scrollable qui s'adapte */}
-                      <div className="flex-1 bg-black rounded-lg p-3 overflow-y-auto min-h-0">
-                        <div className="text-sm text-white whitespace-pre-wrap font-mono leading-relaxed select-all">
+                      {/* Message dans zone auto-expandable */}
+                      <div className="bg-black rounded-lg p-4 overflow-y-auto max-h-80 min-h-[200px]">
+                        <div className="text-sm text-white whitespace-pre-wrap leading-relaxed select-all cursor-text">
                           {orderMessage}
                         </div>
                       </div>
                     </div>
                     
-                    {/* Bouton Commander fixe en bas */}
-                    {messageCopied ? (
-                      <div className="space-y-3">
-                        <div className="text-center text-green-400 text-sm font-medium">
-                          ✅ Message copié ! Cliquez Commander pour ouvrir Signal
+                    {/* Instructions simples */}
+                    <div className="text-center">
+                      {messageCopied ? (
+                        <div className="text-green-400 text-sm font-medium bg-green-500/10 p-3 rounded-lg">
+                          ✅ Message copié ! Cliquez "Commander" en bas pour ouvrir Signal
                         </div>
-                        <button
-                          onClick={() => {
-                            if (orderLink && orderLink.trim() !== '') {
-                              try {
-                                console.log('📱 Ouverture Signal:', orderLink);
-                                window.open(orderLink, '_blank');
-                                toast.success('📱 Signal ouvert ! Collez votre message');
-                                
-                                // Vider le panier après ouverture réussie
-                                setTimeout(() => {
-                                  clearCart();
-                                  setIsOpen(false);
-                                  setCurrentStep('cart');
-                                  setOrderMessage('');
-                                  setMessageCopied(false);
-                                }, 1000);
-                              } catch (error) {
-                                console.error('❌ Erreur ouverture Signal:', error);
-                                toast.error('❌ Impossible d\'ouvrir Signal automatiquement');
-                              }
-                            } else {
-                              toast.error('❌ Aucun lien Signal configuré');
-                            }
-                          }}
-                          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-4 px-6 rounded-lg font-bold text-lg"
-                        >
-                          📱 COMMANDER SUR SIGNAL
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="text-center text-gray-400 text-sm">
-                        👆 Copiez d'abord le message ci-dessus
-                      </div>
-                    )}
+                      ) : (
+                        <div className="text-gray-400 text-sm bg-gray-800/30 p-3 rounded-lg">
+                          👆 Copiez le message ci-dessus, puis cliquez "Commander" en bas
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
               
-              <button
-                onClick={() => setIsOpen(false)}
-                className="mt-3 w-full rounded-lg bg-gray-600 py-2 font-medium text-white hover:bg-gray-500 transition-colors text-sm"
-              >
-                Continuer les achats
-              </button>
+              {currentStep === 'message' ? (
+                // Sur l'étape message, bouton Commander uniquement si copié
+                messageCopied ? (
+                  <button
+                    onClick={() => {
+                      if (orderLink && orderLink.trim() !== '') {
+                        try {
+                          console.log('📱 Ouverture Signal depuis bouton Commander:', orderLink);
+                          window.open(orderLink, '_blank');
+                          toast.success('📱 Signal ouvert ! Collez votre message');
+                          
+                          // Vider le panier après ouverture
+                          setTimeout(() => {
+                            clearCart();
+                            setIsOpen(false);
+                            setCurrentStep('cart');
+                            setOrderMessage('');
+                            setMessageCopied(false);
+                          }, 1000);
+                        } catch (error) {
+                          console.error('❌ Erreur ouverture Signal:', error);
+                          toast.error('❌ Impossible d\'ouvrir Signal');
+                        }
+                      } else {
+                        toast.error('❌ Aucun lien Signal configuré');
+                      }
+                    }}
+                    className="mt-3 w-full rounded-lg bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 py-4 font-bold text-white transition-all text-xl shadow-lg"
+                  >
+                    📱 COMMANDER
+                  </button>
+                ) : null
+              ) : (
+                // Autres étapes, bouton continuer normal
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="mt-3 w-full rounded-lg bg-gray-600 py-2 font-medium text-white hover:bg-gray-500 transition-colors text-sm"
+                >
+                  Continuer les achats
+                </button>
+              )}
             </div>
           )}
         </div>
