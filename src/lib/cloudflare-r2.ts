@@ -88,7 +88,22 @@ class CloudflareR2Client {
     
     const key = `${folder}/${timestamp}-${randomId}.${extension}`;
     
-    return this.uploadFile(file, key, file instanceof File ? file.type : 'video/mp4');
+    console.log('🎥 R2 uploadVideo:', {
+      originalName: file instanceof File ? file.name : 'Buffer',
+      extension: extension,
+      newKey: key,
+      fileSize: file instanceof File ? file.size : 'unknown',
+      timestamp: timestamp
+    });
+    
+    try {
+      const result = await this.uploadFile(file, key, file instanceof File ? file.type : 'video/mp4');
+      console.log('✅ R2 uploadVideo réussi:', result);
+      return result;
+    } catch (error) {
+      console.error('❌ R2 uploadVideo échec:', error);
+      throw error;
+    }
   }
 
   // Supprimer un fichier

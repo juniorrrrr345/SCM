@@ -4,13 +4,33 @@ import r2Client from '../../../../lib/cloudflare-r2';
 // POST - Upload d'image vers Cloudflare R2
 export async function POST(request: NextRequest) {
   try {
+    console.log('🎬 API Upload - Début traitement...');
+    
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const folder = formData.get('folder') as string || 'images';
 
+    console.log('📋 Données reçues:', {
+      hasFile: !!file,
+      fileName: file?.name,
+      fileType: file?.type,
+      fileSize: file?.size,
+      folder: folder
+    });
+
     if (!file) {
+      console.error('❌ Aucun fichier dans la requête');
       return NextResponse.json(
         { error: 'Aucun fichier fourni' },
+        { status: 400 }
+      );
+    }
+
+    // Validation nom de fichier pour éviter erreurs pattern
+    if (file.name && /[<>"'`\n\r\t]/.test(file.name)) {
+      console.error('❌ Caractères interdits dans nom fichier:', file.name);
+      return NextResponse.json(
+        { error: 'Nom de fichier contient des caractères non autorisés. Renommez votre fichier.' },
         { status: 400 }
       );
     }
@@ -43,18 +63,31 @@ export async function POST(request: NextRequest) {
     }
 
     // Upload vers R2 (images ou vidéos)
-    const mediaUrl = isVideo 
-      ? await r2Client.uploadVideo(file, folder)
-      : await r2Client.uploadImage(file, folder);
+    console.log(`🚀 Upload vers R2 - Type: ${isVideo ? 'vidéo' : 'image'}`);
+    
+    let mediaUrl;
+    try {
+      mediaUrl = isVideo 
+        ? await r2Client.uploadVideo(file, folder)
+        : await r2Client.uploadImage(file, folder);
+      
+      console.log('✅ Upload R2 réussi:', mediaUrl);
+    } catch (r2Error) {
+      console.error('❌ Erreur upload R2:', r2Error);
+      throw r2Error;
+    }
 
-    return NextResponse.json({
+    const result = {
       success: true,
       url: mediaUrl,
       secure_url: mediaUrl, // Pour compatibilité avec Cloudinary
       public_id: mediaUrl.split('/').pop(), // Pour compatibilité
       resource_type: isVideo ? 'video' : 'image', // Type de média
       format: file.name.split('.').pop(), // Extension du fichier
-    });
+    };
+    
+    console.log('📤 Réponse envoyée:', result);
+    return NextResponse.json(result);
 
   } catch (error) {
     console.error('Erreur upload R2:', error);

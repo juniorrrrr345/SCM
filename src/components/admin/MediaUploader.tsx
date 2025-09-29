@@ -45,18 +45,27 @@ export default function MediaUploader({
       console.log('🚀 Début upload client:', {
         name: file.name,
         type: file.type,
-        size: file.size
+        size: file.size,
+        lastModified: file.lastModified,
+        webkitRelativePath: file.webkitRelativePath
       });
       
       const formData = new FormData();
       formData.append('file', file);
+      
+      console.log('📦 FormData créé, envoi vers API...');
 
       const response = await fetch('/api/cloudflare/upload', {
         method: 'POST',
         body: formData,
       });
 
-      console.log('📡 Réponse serveur:', response.status);
+      console.log('📡 Réponse serveur:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        headers: Object.fromEntries(response.headers.entries())
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -76,8 +85,35 @@ export default function MediaUploader({
       event.target.value = '';
       
     } catch (error) {
-      console.error('❌ Erreur upload client:', error);
-      setError(error instanceof Error ? error.message : 'Erreur upload inconnue');
+      console.error('❌ ERREUR UPLOAD CLIENT COMPLÈTE:', {
+        error: error,
+        message: error instanceof Error ? error.message : 'Erreur inconnue',
+        stack: error instanceof Error ? error.stack : 'Pas de stack',
+        name: error instanceof Error ? error.name : 'Type inconnu',
+        fileName: file.name,
+        fileType: file.type,
+        fileSize: file.size
+      });
+      
+      // Détection spécifique erreur pattern
+      let errorMsg = 'Erreur upload inconnue';
+      if (error instanceof Error) {
+        errorMsg = error.message;
+        
+        if (error.message.includes('string did not match the expected pattern')) {
+          console.error('🎯 ERREUR PATTERN DÉTECTÉE!', {
+            fileName: file.name,
+            fileType: file.type,
+            containsSpecialChars: /[<>"'`\n\r\t]/.test(file.name),
+            isValidUTF8: /^[\x00-\x7F]*$/.test(file.name),
+            nameLength: file.name.length,
+            actualName: JSON.stringify(file.name)
+          });
+          errorMsg = `Erreur de format de fichier. Nom du fichier problématique: "${file.name}". Essayez de renommer votre fichier sans caractères spéciaux.`;
+        }
+      }
+      
+      setError(errorMsg);
     } finally {
       setUploading(false);
     }
