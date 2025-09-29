@@ -2,7 +2,7 @@
 import { useState, useEffect, useLayoutEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '../components/Header';
-// Redéploiement forcé - Nouveau chargement LANATIONDULAIT
+// Redéploiement forcé - Nouveau chargement SCM
 import CategoryFilter from '../components/CategoryFilter';
 import ProductCard, { Product } from '../components/ProductCard';
 import ProductDetail from '../components/ProductDetail';
@@ -146,7 +146,7 @@ export default function HomePage() {
       }
 
     } catch (error) {
-      console.error('❌ Erreur chargement LANATIONDULAIT:', error);
+      console.error('❌ Erreur chargement SCM:', error);
       setProducts([]);
       setCategories(['Toutes les catégories']);
     }
@@ -247,7 +247,7 @@ export default function HomePage() {
               
               {/* Footer */}
               <div className="text-white text-sm font-medium drop-shadow-md">
-                <p>LANATIONDULAIT</p>
+                <p>SCM</p>
               </div>
             </div>
           </div>

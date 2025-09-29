@@ -21,12 +21,12 @@ export default function ContactPageClient() {
       
       if (response.ok) {
         const pageData = await response.json();
-        setContent(pageData.content || 'Contactez LANATION DU LAIT pour toute question.');
+        setContent(pageData.content || 'Contactez SCM pour toute question.');
       } else {
-        setContent('Contactez LANATION DU LAIT pour toute question.');
+        setContent('Contactez SCM pour toute question.');
       }
     } catch (error) {
-      setContent('Contactez LANATION DU LAIT pour toute question.');
+      setContent('Contactez SCM pour toute question.');
     } finally {
       setLoading(false);
     }

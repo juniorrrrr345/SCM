@@ -46,8 +46,8 @@ export default function AdminLogin({ onLogin }: AdminLoginProps) {
       <div className="w-full max-w-md relative z-10">
         {/* Logo */}
         <div className="text-center mb-8">
-                      <h1 className="text-4xl font-black text-white mb-2">LANATIONDULAIT</h1>
-          <p className="text-gray-400 font-medium">Panel d'Administration - LANATIONDULAIT</p>
+                      <h1 className="text-4xl font-black text-white mb-2">SCM</h1>
+          <p className="text-gray-400 font-medium">Panel d'Administration - SCM</p>
         </div>
 
         {/* Formulaire de connexion */}

@@ -66,7 +66,7 @@ export default function TestAPIPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-black text-white p-8">
-        <h1 className="text-2xl font-bold mb-4">Test des APIs LANATIONDULAIT</h1>
+        <h1 className="text-2xl font-bold mb-4">Test des APIs SCM</h1>
         <p>Chargement...</p>
       </div>
     );
@@ -74,7 +74,7 @@ export default function TestAPIPage() {
 
   return (
     <div className="min-h-screen bg-black text-white p-8">
-      <h1 className="text-2xl font-bold mb-8">Test des APIs LANATIONDULAIT</h1>
+      <h1 className="text-2xl font-bold mb-8">Test des APIs SCM</h1>
       
       <button 
         onClick={loadAllData}

@@ -21,12 +21,12 @@ export default function InfoPageClient() {
       
       if (response.ok) {
         const pageData = await response.json();
-        setContent(pageData.content || 'Bienvenue chez LANATION DU LAIT !');
+        setContent(pageData.content || 'Bienvenue chez SCM !');
       } else {
-        setContent('Bienvenue chez LANATION DU LAIT !');
+        setContent('Bienvenue chez SCM !');
       }
     } catch (error) {
-      setContent('Bienvenue chez LANATION DU LAIT !');
+      setContent('Bienvenue chez SCM !');
     } finally {
       setLoading(false);
     }
