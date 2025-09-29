@@ -212,8 +212,13 @@ export default function HomePage() {
     })
     .sort((a, b) => {
       // Regrouper par ferme d'abord, puis par nom
-      const farmA = a.farm || 'Zzz_Sans ferme'; // Mettre les produits sans ferme à la fin
-      const farmB = b.farm || 'Zzz_Sans ferme';
+      const farmA = a.farm || '';
+      const farmB = b.farm || '';
+      
+      // Les produits sans ferme vont à la fin
+      if (!farmA && farmB) return 1;
+      if (farmA && !farmB) return -1;
+      if (!farmA && !farmB) return a.name.localeCompare(b.name);
       
       if (farmA !== farmB) {
         return farmA.localeCompare(farmB);
@@ -327,15 +332,20 @@ export default function HomePage() {
                     // Affichage groupé par ferme
                     <div className="space-y-8">
                       {(() => {
-                        // Grouper les produits par ferme
+                        // Grouper les produits par ferme (exclure les produits sans ferme)
                         const productsByFarm = filteredProducts.reduce((acc: Record<string, typeof filteredProducts>, product) => {
-                          const farmName = product.farm || 'Sans ferme assignée';
+                          // Ignorer les produits sans ferme assignée
+                          if (!product.farm || product.farm.trim() === '') {
+                            return acc;
+                          }
+                          
+                          const farmName = product.farm;
                           if (!acc[farmName]) acc[farmName] = [];
                           acc[farmName].push(product);
                           return acc;
                         }, {});
 
-                        return Object.entries(productsByFarm).map(([farmName, farmProducts]) => (
+                        const farmGroups = Object.entries(productsByFarm).map(([farmName, farmProducts]) => (
                           <div key={farmName}>
                             {/* Header de ferme */}
                             <div className="flex items-center gap-3 mb-4">
@@ -360,6 +370,24 @@ export default function HomePage() {
                             </div>
                           </div>
                         ));
+
+                        // Ajouter les produits sans ferme à la fin, sans header
+                        const productsWithoutFarm = filteredProducts.filter(product => !product.farm || product.farm.trim() === '');
+                        
+                        return [
+                          ...farmGroups,
+                          ...(productsWithoutFarm.length > 0 ? [
+                            <div key="no-farm" className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+                              {productsWithoutFarm.map((product) => (
+                                <ProductCard
+                                  key={product._id}
+                                  product={product}
+                                  onClick={() => setSelectedProduct(product)}
+                                />
+                              ))}
+                            </div>
+                          ] : [])
+                        ];
                       })()}
                     </div>
                   ) : (
