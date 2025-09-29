@@ -3,7 +3,7 @@
 # Script d'initialisation de la base Cloudflare D1
 
 ACCOUNT_ID="7979421604bd07b3bd34d3ed96222512"
-DATABASE_ID="854d0539-5e04-4e2a-a4fd-b0cfa98c7598"
+DATABASE_ID="301c5e01-cf71-4788-8025-ecc4dd7a9649"
 API_TOKEN="ijkVhaXCw6LSddIMIMxwPL5CDAWznxip5x9I1bNW"
 BASE_URL="https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/d1/database/$DATABASE_ID/query"
 
