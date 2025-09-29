@@ -1065,7 +1065,7 @@ export default function ProductsManager() {
                             }
                           }}
                           acceptedTypes="image/*"
-                          maxSize={5}
+                          maxSize={200}
                           className="mb-2"
                         />
                       </div>
@@ -1126,7 +1126,7 @@ export default function ProductsManager() {
                             }
                           }}
                           acceptedTypes="video/*,.mov,.avi,.3gp,.mkv,.flv,.m4v,.wmv,.webm,.mp4,.ogg"
-                          maxSize={5} // Très réduit pour éviter erreur 413
+                          maxSize={200} // Limite adaptée pour vidéos
                           className="mb-2"
                         />
                       </div>

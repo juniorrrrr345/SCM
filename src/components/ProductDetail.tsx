@@ -98,10 +98,20 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
 
         {/* Contenu scrollable avec padding bottom pour éviter que le contenu soit caché */}
         <div className="w-full h-full overflow-y-auto pb-20">
-          {/* Image ou vidéo - affichage direct et simple */}
+          {/* Image ET vidéo si disponibles - affichage priorité image */}
           <div className="relative w-full aspect-square bg-black">
-            {product.video_url && product.video_url.trim() !== '' ? (
-              // Affichage vidéo direct avec debug
+            {product.image_url && product.image_url.trim() !== '' ? (
+              // Affichage image en priorité avec debug
+              <img 
+                src={product.image_url}
+                alt={product.name}
+                className="w-full h-full object-contain"
+                loading="lazy"
+                onLoad={() => console.log('✅ Image chargée avec succès:', product.image_url)}
+                onError={(e) => console.error('❌ Erreur chargement image:', e, product.image_url)}
+              />
+            ) : product.video_url && product.video_url.trim() !== '' ? (
+              // Fallback sur vidéo si pas d'image
               <video 
                 src={product.video_url}
                 className="w-full h-full object-contain"
@@ -118,26 +128,39 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
                 <source src={product.video_url} type="video/ogg" />
                 Votre navigateur ne supporte pas la lecture vidéo.
               </video>
-            ) : product.image_url && product.image_url.trim() !== '' ? (
-              // Affichage image direct avec debug
-              <img 
-                src={product.image_url}
-                alt={product.name}
-                className="w-full h-full object-contain"
-                loading="lazy"
-                onLoad={() => console.log('✅ Image chargée avec succès:', product.image_url)}
-                onError={(e) => console.error('❌ Erreur chargement image:', e, product.image_url)}
-              />
             ) : (
-              // Placeholder si ni vidéo ni image
+              // Placeholder si ni image ni vidéo
               <div className="w-full h-full flex items-center justify-center text-gray-400">
                 <div className="text-center">
                   <div className="text-4xl mb-2">📷</div>
-                  <div>Aucune image</div>
+                  <div>Aucun média</div>
                 </div>
               </div>
             )}
           </div>
+          
+          {/* Vidéo additionnelle en dessous si image ET vidéo disponibles */}
+          {product.image_url && product.image_url.trim() !== '' && 
+           product.video_url && product.video_url.trim() !== '' && (
+            <div className="w-full mt-4">
+              <div className="text-white font-medium mb-2">🎥 Vidéo du produit :</div>
+              <div className="w-full aspect-video bg-black rounded-lg overflow-hidden">
+                <video 
+                  src={product.video_url}
+                  className="w-full h-full object-contain"
+                  controls
+                  muted
+                  playsInline
+                  preload="metadata"
+                >
+                  <source src={product.video_url} type="video/mp4" />
+                  <source src={product.video_url} type="video/webm" />
+                  <source src={product.video_url} type="video/ogg" />
+                  Votre navigateur ne supporte pas la lecture vidéo.
+                </video>
+              </div>
+            </div>
+          )}
 
           {/* Infos produit */}
           <div className="p-4 space-y-4">
