@@ -156,7 +156,12 @@ export default function ProductsManager() {
       promotions: { ...product.promotions } || {}
     });
     
-    console.log('✅ FormData initialisé:', { category: product.category });
+    console.log('✅ FormData initialisé:', { 
+      category: product.category,
+      farm: product.farm,
+      farm_id: product.farm_id,
+      productData: product
+    });
     // Synchroniser les états locaux des prix
     const priceStrings: { [key: string]: string } = {};
     const quantityStrings: { [key: string]: string } = {};
