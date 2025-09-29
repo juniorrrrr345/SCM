@@ -16,7 +16,7 @@ export async function GET() {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        sql: 'SELECT * FROM social_links WHERE is_available = 1 ORDER BY created_at ASC'
+        sql: 'SELECT * FROM social_links WHERE is_active = 1 ORDER BY created_at ASC'
       })
     });
     
@@ -28,7 +28,7 @@ export async function GET() {
       const socialLinks = data.result[0].results.map((link: any) => ({
         ...link,
         _id: link.id, // Frontend s'attend à _id
-        name: link.platform // Frontend s'attend à name
+        platform: link.name // Frontend s'attend à platform
       }));
       console.log('🌐 Liens sociaux récupérés:', socialLinks.length);
       return NextResponse.json(socialLinks);
@@ -45,11 +45,14 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { platform, url, icon = '🔗', is_available = true } = body;
+    const { platform, name, url, icon = '🔗', is_active = true, is_available = true } = body;
 
-    if (!platform || !url) {
+    const finalName = platform || name;
+    const finalIsActive = is_active ?? is_available ?? true;
+
+    if (!finalName || !url) {
       return NextResponse.json(
-        { error: 'La plateforme et l\'URL sont requis' },
+        { error: 'Le nom/plateforme et l\'URL sont requis' },
         { status: 400 }
       );
     }
@@ -67,8 +70,8 @@ export async function POST(request: Request) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        sql: 'INSERT INTO social_links (platform, url, icon, is_available) VALUES (?, ?, ?, ?)',
-        params: [platform, url, icon, is_available ? 1 : 0]
+        sql: 'INSERT INTO social_links (name, url, icon, is_active) VALUES (?, ?, ?, ?)',
+        params: [finalName, url, icon, finalIsActive ? 1 : 0]
       })
     });
     
