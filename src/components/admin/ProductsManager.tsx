@@ -861,6 +861,9 @@ export default function ProductsManager() {
                     {product.name}
                   </h3>
                   <p className="text-gray-400 text-xs uppercase tracking-wider mb-1">{product.category}</p>
+                  {product.farm && (
+                    <p className="text-green-400 text-xs font-medium mb-1">{product.farm}</p>
+                  )}
                   
 
                   
@@ -915,8 +918,15 @@ export default function ProductsManager() {
                   <span className="text-gray-400 text-2xl">📷</span>
                 </div>
               )}
-              <div className="absolute top-2 left-2 bg-white/90 text-black text-xs font-bold px-2 py-1 rounded-md">
-                {product.category}
+              <div className="absolute top-2 left-2 space-y-1">
+                <div className="bg-white/90 text-black text-xs font-bold px-2 py-1 rounded-md">
+                  {product.category}
+                </div>
+                {product.farm && (
+                  <div className="bg-green-500/90 text-white text-xs font-bold px-2 py-1 rounded-md">
+                    🏭 {product.farm}
+                  </div>
+                )}
               </div>
               {product.video_url && (
                 <div className="absolute top-2 right-2 bg-black/80 text-white p-1 rounded-full">
