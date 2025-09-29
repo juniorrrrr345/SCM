@@ -43,6 +43,15 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
 
   if (!product) return null;
 
+  // Debug du produit
+  console.log('🔍 ProductDetail - Produit reçu:', {
+    name: product.name,
+    image_url: product.image_url,
+    video_url: product.video_url,
+    hasImage: !!(product.image_url && product.image_url.trim() !== ''),
+    hasVideo: !!(product.video_url && product.video_url.trim() !== '')
+  });
+
   // Créer une liste des prix avec promotions
   const priceList = Object.entries(product.prices || {})
     .filter(([, price]) => {
@@ -89,25 +98,38 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
 
         {/* Contenu scrollable avec padding bottom pour éviter que le contenu soit caché */}
         <div className="w-full h-full overflow-y-auto pb-20">
-          {/* Image ou vidéo - avec support étendu */}
+          {/* Image ou vidéo - affichage direct et simple */}
           <div className="relative w-full aspect-square bg-black">
             {product.video_url && product.video_url.trim() !== '' ? (
-              <MediaDisplay
-                url={product.video_url}
-                alt={product.name}
-                className="w-full h-full"
-                controls={true}
-                autoPlay={false}
-                loop={false}
-                muted={true}
-              />
+              // Affichage vidéo direct avec debug
+              <video 
+                src={product.video_url}
+                className="w-full h-full object-contain"
+                controls
+                muted
+                playsInline
+                preload="metadata"
+                onLoadStart={() => console.log('🎥 Début chargement vidéo:', product.video_url)}
+                onLoadedData={() => console.log('✅ Vidéo chargée avec succès')}
+                onError={(e) => console.error('❌ Erreur chargement vidéo:', e, product.video_url)}
+              >
+                <source src={product.video_url} type="video/mp4" />
+                <source src={product.video_url} type="video/webm" />
+                <source src={product.video_url} type="video/ogg" />
+                Votre navigateur ne supporte pas la lecture vidéo.
+              </video>
             ) : product.image_url && product.image_url.trim() !== '' ? (
-              <MediaDisplay
-                url={product.image_url}
+              // Affichage image direct avec debug
+              <img 
+                src={product.image_url}
                 alt={product.name}
-                className="w-full h-full"
+                className="w-full h-full object-contain"
+                loading="lazy"
+                onLoad={() => console.log('✅ Image chargée avec succès:', product.image_url)}
+                onError={(e) => console.error('❌ Erreur chargement image:', e, product.image_url)}
               />
             ) : (
+              // Placeholder si ni vidéo ni image
               <div className="w-full h-full flex items-center justify-center text-gray-400">
                 <div className="text-center">
                   <div className="text-4xl mb-2">📷</div>
