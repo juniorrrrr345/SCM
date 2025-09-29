@@ -21,7 +21,6 @@
       "memory": 3008
     }
   },
-  "maxDuration": 300,
   "regions": ["iad1"],
   "framework": "nextjs",
   "headers": [
