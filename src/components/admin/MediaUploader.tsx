@@ -11,7 +11,7 @@ interface MediaUploaderProps {
 export default function MediaUploader({ 
   onMediaSelected, 
   acceptedTypes = "image/*,video/*,.mov,.avi,.3gp,.mkv,.flv,.m4v,.wmv,.webm,.mp4,.ogg",
-  maxSize = 200, // Limite par défaut pour vidéos
+  maxSize = 500, // Limite par défaut pour vidéos (correspond à l'API)
   className = ""
 }: MediaUploaderProps) {
   const [uploading, setUploading] = useState(false);
@@ -23,7 +23,7 @@ export default function MediaUploader({
 
     // Vérifier la taille selon le type de fichier (Cloudflare R2 limites)
     const isVideo = file.type.startsWith('video/');
-    const actualMaxSize = isVideo ? 200 : 10; // 200MB pour vidéos, 10MB pour images
+    const actualMaxSize = isVideo ? 500 : 10; // 500MB pour vidéos, 10MB pour images
     const maxBytes = actualMaxSize * 1024 * 1024;
     
     if (file.size > maxBytes) {
@@ -108,10 +108,10 @@ export default function MediaUploader({
         
         <span className="text-sm text-gray-400">
           {acceptedTypes.includes('video') && acceptedTypes.includes('image') 
-            ? 'Images (5MB) & Vidéos (10MB) - MP4, MOV, WebM'
+            ? 'Images (10MB) & Vidéos (500MB) - Tous formats supportés'
             : acceptedTypes.includes('video')
-            ? 'Vidéos (max 10MB) - MP4, MOV, WebM'
-            : 'Images (max 5MB) - JPG, PNG, WebP'
+            ? 'Vidéos (max 500MB) - MP4, MOV, WebM, AVI, MKV, etc.'
+            : 'Images (max 10MB) - JPG, PNG, WebP, GIF'
           }
         </span>
       </div>
