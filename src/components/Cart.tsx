@@ -147,37 +147,70 @@ export default function Cart() {
     message += `Commande depuis le site SCM\n`;
     message += `Merci de confirmer votre commande !`;
     
-    // Copier automatiquement le message dans le presse-papiers
+    // Choisir le bon lien selon le service pour Signal
+    let chosenLink = orderLink; // Fallback par défaut
+    
+    if (serviceLinks[targetService]) {
+      chosenLink = serviceLinks[targetService];
+      console.log(`📱 Utilisation du lien Signal spécifique pour ${targetService}:`, chosenLink);
+    } else {
+      console.log(`📱 Pas de lien Signal configuré pour ${targetService}, utilisation du lien principal`);
+    }
+    
+    // Copier le message dans le presse-papiers ET rediriger vers Signal
     try {
       await navigator.clipboard.writeText(message);
       console.log(`📋 Message copié pour ${targetService}:`, message);
       
-      // Afficher une notification de succès avec instructions pour Signal
-      toast.success(
-        `📋 Message copié ! Collez-le maintenant dans Signal pour envoyer votre commande ${serviceName}`,
-        { duration: 6000 }
-      );
+      // Rediriger vers Signal après avoir copié
+      if (chosenLink && chosenLink.trim() !== '') {
+        // Encoder le message pour l'URL
+        const encodedMessage = encodeURIComponent(message);
+        
+        // Construire l'URL Signal
+        let finalUrl = chosenLink;
+        
+        // Signal supporte différents formats de liens
+        if (chosenLink.includes('signal.me') || chosenLink.includes('signal.org')) {
+          // Lien Signal direct avec message
+          const separator = chosenLink.includes('?') ? '&' : '?';
+          finalUrl = `${chosenLink}${separator}text=${encodedMessage}`;
+        } else {
+          // Autre format de lien Signal ou lien personnalisé
+          finalUrl = chosenLink;
+        }
+        
+        console.log(`📱 Redirection vers Signal:`, finalUrl);
+        window.open(finalUrl, '_blank');
+        
+        toast.success(
+          `📱 Redirection vers Signal ! Le message est déjà copié pour être collé`,
+          { duration: 4000 }
+        );
+      } else {
+        // Pas de lien configuré, juste copier
+        toast.success(
+          `📋 Message copié ! Ouvrez Signal et collez votre commande ${serviceName}`,
+          { duration: 6000 }
+        );
+      }
       
-      // Vider le panier après 3 secondes
+      // Vider le panier après 2 secondes
       setTimeout(() => {
         clearCart();
         setIsOpen(false);
-        
-        // Message final pour rediriger vers Signal
-        toast(
-          `📱 Maintenant, ouvrez Signal et collez votre commande ${serviceName} !`,
-          { 
-            duration: 8000,
-            icon: '📱'
-          }
-        );
-      }, 3000);
+      }, 2000);
       
     } catch (err) {
       console.error('❌ Erreur copie presse-papiers:', err);
       
-      // Fallback : afficher le message dans une popup
-      alert(`Voici votre commande à copier-coller dans Signal :\n\n${message}`);
+      // Fallback : rediriger vers Signal sans copie automatique
+      if (chosenLink && chosenLink.trim() !== '') {
+        window.open(chosenLink, '_blank');
+        alert(`Voici votre commande à copier-coller dans Signal :\n\n${message}`);
+      } else {
+        alert(`Voici votre commande à copier-coller dans Signal :\n\n${message}`);
+      }
       
       toast.success(`📱 Copiez le message affiché et envoyez-le dans Signal !`);
     }
@@ -233,35 +266,64 @@ export default function Cart() {
     completeMessage += `Commande depuis le site SCM\n`;
     completeMessage += `Merci de confirmer votre commande !`;
     
-    // Copier le message complet
+    // Copier le message ET rediriger vers Signal
     try {
       await navigator.clipboard.writeText(completeMessage);
       console.log('📋 Message complet copié:', completeMessage);
       
-      toast.success(
-        '📋 Commande complète copiée ! Collez-la dans Signal pour envoyer tous vos articles',
-        { duration: 6000 }
-      );
+      // Choisir le lien Signal principal
+      let signalLink = orderLink;
       
-      // Vider le panier et fermer après 3 secondes
+      // Rediriger vers Signal après avoir copié
+      if (signalLink && signalLink.trim() !== '') {
+        // Encoder le message pour l'URL
+        const encodedMessage = encodeURIComponent(completeMessage);
+        
+        // Construire l'URL Signal
+        let finalUrl = signalLink;
+        
+        // Signal supporte différents formats de liens
+        if (signalLink.includes('signal.me') || signalLink.includes('signal.org')) {
+          // Lien Signal direct avec message
+          const separator = signalLink.includes('?') ? '&' : '?';
+          finalUrl = `${signalLink}${separator}text=${encodedMessage}`;
+        } else {
+          // Autre format de lien Signal ou lien personnalisé
+          finalUrl = signalLink;
+        }
+        
+        console.log(`📱 Redirection vers Signal avec commande complète:`, finalUrl);
+        window.open(finalUrl, '_blank');
+        
+        toast.success(
+          `📱 Redirection vers Signal ! Le message est déjà copié, collez-le directement`,
+          { duration: 4000 }
+        );
+      } else {
+        // Pas de lien configuré, juste copier
+        toast.success(
+          '📋 Commande complète copiée ! Ouvrez Signal et collez votre commande',
+          { duration: 6000 }
+        );
+      }
+      
+      // Vider le panier après 2 secondes
       setTimeout(() => {
         clearCart();
         setIsOpen(false);
-        
-        toast(
-          '📱 Maintenant, ouvrez Signal et collez votre commande complète !',
-          { 
-            duration: 8000,
-            icon: '📱'
-          }
-        );
-      }, 3000);
+      }, 2000);
       
     } catch (err) {
       console.error('❌ Erreur copie presse-papiers:', err);
       
-      // Fallback : afficher le message dans une popup
-      alert(`Voici votre commande complète à copier-coller dans Signal :\n\n${completeMessage}`);
+      // Fallback : rediriger vers Signal sans copie automatique
+      let signalLink = orderLink;
+      if (signalLink && signalLink.trim() !== '') {
+        window.open(signalLink, '_blank');
+        alert(`Voici votre commande complète à copier-coller dans Signal :\n\n${completeMessage}`);
+      } else {
+        alert(`Voici votre commande complète à copier-coller dans Signal :\n\n${completeMessage}`);
+      }
       
       toast.success('📱 Copiez le message affiché et envoyez-le dans Signal !');
     }
@@ -659,7 +721,7 @@ export default function Cart() {
                         return (
                           <div className="space-y-2">
                             <div className="text-xs text-blue-400 bg-blue-500/10 p-2 rounded border border-blue-500/20">
-                              📱 Le message sera copié automatiquement pour Signal
+                              📱 Copie automatique + redirection vers Signal
                             </div>
                             <button
                               onClick={() => handleSendOrderByService(service)}
@@ -670,7 +732,7 @@ export default function Cart() {
                                 <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
                                 <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
                               </svg>
-                              {serviceIcon} Copier commande {serviceName}
+                              📱 {serviceIcon} Envoyer via Signal - {serviceName}
                             </button>
                           </div>
                         );
@@ -680,7 +742,7 @@ export default function Cart() {
                           <div className="space-y-3">
                             <div className="text-sm text-blue-400 bg-blue-500/10 p-3 rounded border border-blue-500/20">
                               <p className="font-medium mb-2">📋 Plusieurs services détectés :</p>
-                              <p className="text-xs">Vous pouvez copier par service séparé ou tout ensemble pour Signal</p>
+                              <p className="text-xs">Redirection automatique vers Signal avec message copié</p>
                             </div>
                             
                             {/* Boutons par service */}
@@ -698,7 +760,7 @@ export default function Cart() {
                                     className="w-full rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 py-3 font-medium text-white hover:from-blue-600 hover:to-blue-700 transition-all flex items-center justify-between px-4"
                                   >
                                     <span className="flex items-center gap-2">
-                                      📋 {serviceIcon} Copier {serviceName}
+                                      📱 {serviceIcon} Signal {serviceName}
                                     </span>
                                     <span className="text-sm">{serviceTotal.toFixed(2)}€ • {serviceItems.length} art.</span>
                                   </button>
@@ -717,7 +779,7 @@ export default function Cart() {
                                   <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
                                   <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
                                 </svg>
-                                📋 Copier TOUTE la commande
+                                📱 Envoyer TOUT via Signal
                               </button>
                             </div>
                           </div>
