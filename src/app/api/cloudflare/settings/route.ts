@@ -29,13 +29,13 @@ async function executeSqlOnD1(sql: string, params: any[] = []) {
 // GET - Récupérer les paramètres
 export async function GET() {
   try {
-    console.log('🔍 GET settings LANATIONDULAIT...');
+    console.log('🔍 GET settings SCM...');
     
     const result = await executeSqlOnD1('SELECT * FROM settings WHERE id = 1');
     
     if (result.result?.[0]?.results?.length) {
       const settings = result.result[0].results[0];
-      console.log('✅ Settings LANATIONDULAIT récupérés:', settings);
+      console.log('✅ Settings SCM récupérés:', settings);
       
       // Mapper les champs D1 vers le format attendu par le frontend
       const mappedSettings = {
@@ -43,8 +43,8 @@ export async function GET() {
         backgroundImage: settings.background_image,
         backgroundOpacity: settings.background_opacity || 20,
         backgroundBlur: settings.background_blur || 5,
-        shopTitle: settings.shop_title || 'LANATIONDULAIT',
-        shopName: settings.shop_title || 'LANATIONDULAIT',
+        shopTitle: settings.shop_title || 'SCM',
+        shopName: settings.shop_title || 'SCM',
         infoContent: settings.info_content,
         contactContent: settings.contact_content,
         whatsappLink: settings.whatsapp_link || '',
@@ -72,20 +72,20 @@ export async function GET() {
       
       return NextResponse.json(mappedSettings);
     } else {
-      // Retourner des paramètres par défaut LANATIONDULAIT
+      // Retourner des paramètres par défaut SCM
       const defaultSettings = {
         id: 1,
-        shop_name: 'LANATIONDULAIT',
+        shop_name: 'SCM',
         background_image: 'https://pub-b38679a01a274648827751df94818418.r2.dev/images/background-oglegacy.jpeg',
         background_opacity: 20,
         background_blur: 5,
-        info_content: 'Bienvenue chez LANATIONDULAIT - Votre boutique premium',
-        contact_content: 'Contactez LANATIONDULAIT pour toute question',
+        info_content: 'Bienvenue chez SCM - Votre boutique premium',
+        contact_content: 'Contactez SCM pour toute question',
         backgroundImage: 'https://pub-b38679a01a274648827751df94818418.r2.dev/images/background-oglegacy.jpeg',
         backgroundOpacity: 20,
         backgroundBlur: 5,
-        shopTitle: 'LANATIONDULAIT',
-        shopName: 'LANATIONDULAIT',
+        shopTitle: 'SCM',
+        shopName: 'SCM',
         // Valeurs par défaut pour les nouveaux champs
         telegram_livraison: '',
         telegram_envoi: '',
@@ -98,7 +98,7 @@ export async function GET() {
       return NextResponse.json(defaultSettings);
     }
   } catch (error) {
-    console.error('❌ Erreur GET settings LANATIONDULAIT:', error);
+    console.error('❌ Erreur GET settings SCM:', error);
     return NextResponse.json(
       { error: 'Erreur serveur lors de la récupération des paramètres' },
       { status: 500 }
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
 // PUT - Mettre à jour les paramètres
 export async function PUT(request: NextRequest) {
   try {
-    console.log('🔧 PUT settings LANATIONDULAIT...');
+    console.log('🔧 PUT settings SCM...');
     const body = await request.json();
     
     const {
@@ -152,9 +152,9 @@ export async function PUT(request: NextRequest) {
     const finalBackgroundImage = background_image || backgroundImage;
     const finalBackgroundOpacity = background_opacity ?? backgroundOpacity ?? 20;
     const finalBackgroundBlur = background_blur ?? backgroundBlur ?? 5;
-    const finalInfoContent = info_content || infoContent || 'Bienvenue chez LANATIONDULAIT';
-    const finalContactContent = contact_content || contactContent || 'Contactez LANATIONDULAIT';
-    const finalShopTitle = shop_title || shopTitle || 'LANATIONDULAIT';
+    const finalInfoContent = info_content || infoContent || 'Bienvenue chez SCM';
+    const finalContactContent = contact_content || contactContent || 'Contactez SCM';
+    const finalShopTitle = shop_title || shopTitle || 'SCM';
     const finalWhatsappLink = whatsapp_link || whatsappLink || '';
     const finalWhatsappNumber = whatsapp_number || whatsappNumber || '';
     const finalScrollingText = scrolling_text || scrollingText || '';
@@ -256,15 +256,15 @@ export async function PUT(request: NextRequest) {
     const result = await executeSqlOnD1('SELECT * FROM settings WHERE id = 1');
     const settings = result.result[0].results[0];
     
-    console.log('✅ Settings LANATIONDULAIT mis à jour:', settings);
+    console.log('✅ Settings SCM mis à jour:', settings);
 
     const mappedSettings = {
       ...settings,
       backgroundImage: settings.background_image,
       backgroundOpacity: settings.background_opacity,
       backgroundBlur: settings.background_blur,
-      shopTitle: 'LANATIONDULAIT',
-      shopName: 'LANATIONDULAIT',
+      shopTitle: 'SCM',
+      shopName: 'SCM',
       // Inclure les nouveaux champs dans la réponse
       telegram_livraison: settings.telegram_livraison || '',
       telegram_envoi: settings.telegram_envoi || '',
@@ -285,7 +285,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(mappedSettings);
   } catch (error) {
-    console.error('❌ Erreur PUT settings LANATIONDULAIT:', error);
+    console.error('❌ Erreur PUT settings SCM:', error);
     return NextResponse.json(
       { error: 'Erreur serveur lors de la mise à jour des paramètres' },
       { status: 500 }

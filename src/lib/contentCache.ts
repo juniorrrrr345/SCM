@@ -92,7 +92,7 @@ class ContentCache {
 
   getDefaultSettings() {
     return {
-      shopName: 'LANATIONDULAIT',
+      shopName: 'SCM',
       shopDescription: 'Boutique en ligne moderne',
       backgroundImage: '',
       backgroundOpacity: 20,

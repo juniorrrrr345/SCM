@@ -224,8 +224,7 @@ export default function HomePage() {
               
               {/* Titre principal sans logo (deux lignes) */}
               <div className="text-4xl sm:text-5xl md:text-6xl font-black text-white mb-12 tracking-wider drop-shadow-[0_0_30px_rgba(255,255,255,0.8)] animate-pulse leading-tight text-center">
-                <div>LA NATION</div>
-                <div>DU LAIT</div>
+                <div>SCM</div>
               </div>
               
               {/* Nouvelle barre de chargement style néon */}
