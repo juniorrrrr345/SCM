@@ -11,6 +11,7 @@ import contentCache from '../lib/contentCache';
 import { useAdminSync } from '../hooks/useAdminSync';
 export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState('Toutes les catégories');
+  const [selectedFarm, setSelectedFarm] = useState('Toutes les fermes');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [activeTab, setActiveTab] = useState('menu');
   const router = useRouter();
@@ -122,6 +123,7 @@ export default function HomePage() {
   
   const [products, setProducts] = useState<Product[]>(getInitialProducts());
   const [categories, setCategories] = useState<string[]>(getInitialCategories());
+  const [farms, setFarms] = useState<string[]>(['Toutes les fermes']);
 
   // Fonction de rechargement des données
   const loadAllData = async () => {
@@ -145,10 +147,19 @@ export default function HomePage() {
         setCategories(['Toutes les catégories', ...categoriesData.map((c: any) => c.name)]);
       }
 
+      // Charger les fermes
+      const farmsRes = await fetch('/api/cloudflare/farms', { cache: 'no-store' });
+      if (farmsRes.ok) {
+        const farmsData = await farmsRes.json();
+        console.log('🏭 Fermes:', farmsData.length);
+        setFarms(['Toutes les fermes', ...farmsData.map((f: any) => f.name)]);
+      }
+
     } catch (error) {
       console.error('❌ Erreur chargement SCM:', error);
       setProducts([]);
       setCategories(['Toutes les catégories']);
+      setFarms(['Toutes les fermes']);
     }
   };
 
@@ -181,9 +192,10 @@ export default function HomePage() {
   // Écouter les mises à jour du cache (produits et catégories uniquement)
   useEffect(() => {
     const handleCacheUpdate = (event: CustomEvent) => {
-      const { products: newProducts, categories: newCategories } = event.detail;
+      const { products: newProducts, categories: newCategories, farms: newFarms } = event.detail;
       if (newProducts) setProducts(newProducts);
       if (newCategories) setCategories(['Toutes les catégories', ...newCategories.map((c: any) => c.name)]);
+      if (newFarms) setFarms(['Toutes les fermes', ...newFarms.map((f: any) => f.name)]);
     };
     window.addEventListener('cacheUpdated', handleCacheUpdate as EventListener);
     return () => {
@@ -194,7 +206,8 @@ export default function HomePage() {
   // Filtrage des produits
   const filteredProducts = products.filter(product => {
     const categoryMatch = selectedCategory === 'Toutes les catégories' || product.category === selectedCategory;
-    return categoryMatch;
+    const farmMatch = selectedFarm === 'Toutes les fermes' || product.farm === selectedFarm;
+    return categoryMatch && farmMatch;
   });
 
   const handleTabChange = (tabId: string) => {
@@ -282,6 +295,9 @@ export default function HomePage() {
                   categories={categories}
                   selectedCategory={selectedCategory}
                   onCategoryChange={setSelectedCategory}
+                  farms={farms}
+                  selectedFarm={selectedFarm}
+                  onFarmChange={setSelectedFarm}
                 />
                 
                 <main className="pt-3 pb-24 sm:pb-28 px-3 sm:px-4 lg:px-6 xl:px-8 max-w-7xl mx-auto">
