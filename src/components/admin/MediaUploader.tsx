@@ -38,6 +38,43 @@ export default function MediaUploader({
       type: file.type
     });
 
+    // NOUVEAU: Détection résolution vidéo pour debug
+    if (isVideo) {
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+      
+      video.onloadedmetadata = () => {
+        console.log('🎬 RÉSOLUTION VIDÉO DÉTECTÉE:', {
+          width: video.videoWidth,
+          height: video.videoHeight,
+          duration: video.duration,
+          ratio: `${video.videoWidth}x${video.videoHeight}`,
+          is480p: video.videoHeight >= 480,
+          isHD: video.videoHeight >= 720,
+          fileName: file.name
+        });
+        
+        // Alerter si résolution élevée
+        if (video.videoHeight >= 480) {
+          console.warn('⚠️ RÉSOLUTION ÉLEVÉE DÉTECTÉE! Cela pourrait causer des problèmes.');
+          
+          // Afficher un avertissement à l'utilisateur
+          setError(`⚠️ Vidéo haute résolution (${video.videoWidth}x${video.videoHeight}). Si l'upload échoue, réduisez la qualité à 360p ou 240p avant d'uploader.`);
+          
+          setTimeout(() => {
+            if (confirm(`Votre vidéo est en ${video.videoWidth}x${video.videoHeight} (haute résolution).\n\nCela peut causer des erreurs d'upload.\n\nVoulez-vous continuer quand même ?`)) {
+              setError(''); // Effacer l'avertissement si l'utilisateur veut continuer
+            } else {
+              setUploading(false);
+              return;
+            }
+          }, 100);
+        }
+      };
+      
+      video.src = URL.createObjectURL(file);
+    }
+
     setUploading(true);
     setError('');
 

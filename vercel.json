@@ -2,25 +2,26 @@
   "functions": {
     "src/app/api/products/route.ts": {
       "maxDuration": 300,
-      "memory": 1024
+      "memory": 3008
     },
     "src/app/api/products/[id]/route.ts": {
       "maxDuration": 300,
-      "memory": 1024
+      "memory": 3008
     },
     "src/app/api/upload/route.ts": {
       "maxDuration": 300,
-      "memory": 1024
+      "memory": 3008
     },
     "src/app/api/cloudflare/upload/route.ts": {
       "maxDuration": 300,
-      "memory": 1024
+      "memory": 3008
     },
     "src/app/api/cloudflare/products/route.ts": {
       "maxDuration": 300,
-      "memory": 1024
+      "memory": 3008
     }
   },
+  "maxDuration": 300,
   "regions": ["iad1"],
   "framework": "nextjs",
   "headers": [
