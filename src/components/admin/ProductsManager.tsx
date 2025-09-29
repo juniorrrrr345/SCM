@@ -366,6 +366,9 @@ export default function ProductsManager() {
         url,
         method,
         dataSizeMB: Math.round(requestSizeMB * 100) / 100,
+        name: cleanedFormData.name,
+        category: cleanedFormData.category,
+        farm: cleanedFormData.farm,
         editingProduct: editingProduct ? { 
           id: editingProduct._id, 
           name: editingProduct.name 

@@ -104,12 +104,20 @@ export async function POST(request: NextRequest) {
       }
     }
     
-    // Champ "farm" supprimé de l'UI
+    // Convertir farm en ID si nécessaire
+    let farm_id = body.farm_id;
+    
+    if (body.farm && !farm_id) {
+      const farmData = await executeSqlOnD1('SELECT id FROM farms WHERE name = ?', [body.farm]);
+      if (farmData.success && farmData.result?.[0]?.results?.[0]) {
+        farm_id = farmData.result[0].results[0].id;
+      }
+    }
     
     const sql = `INSERT INTO products (
-      name, description, price, prices, category_id,
+      name, description, price, prices, category_id, farm_id,
       image_url, video_url, stock, is_available, features, tags
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     
     const values = [
       body.name,
@@ -117,6 +125,7 @@ export async function POST(request: NextRequest) {
       parseFloat(body.price) || 0,
       JSON.stringify(body.prices || {}),
       category_id || null,
+      farm_id || null,
       body.image_url || '',
       body.video_url || '',
       parseInt(body.stock) || 0,

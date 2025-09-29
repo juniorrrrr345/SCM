@@ -95,11 +95,24 @@ export async function PUT(
       }
     }
     
-    // Champ "farm" supprimé
+    // Convertir farm en ID si nécessaire
+    let farm_id = body.farm_id;
+    
+    if (body.farm) {
+      console.log('🔍 Conversion ferme:', body.farm);
+      const farmResult = await executeSqlOnD1('SELECT id FROM farms WHERE name = ?', [body.farm]);
+      console.log('🔍 Résultat recherche ferme:', farmResult);
+      if (farmResult.success && farmResult.result?.[0]?.results?.[0]) {
+        farm_id = farmResult.result[0].results[0].id;
+        console.log('✅ Ferme convertie:', body.farm, '→ ID', farm_id);
+      } else {
+        console.log('❌ Ferme non trouvée:', body.farm);
+      }
+    }
 
     const sql = `UPDATE products SET 
       name = ?, description = ?, price = ?, prices = ?, 
-      category_id = ?, image_url = ?, video_url = ?, 
+      category_id = ?, farm_id = ?, image_url = ?, video_url = ?, 
       stock = ?, is_available = ?, features = ?, tags = ?
       WHERE id = ?`;
     
@@ -109,6 +122,7 @@ export async function PUT(
       parseFloat(body.price) || 0,
       JSON.stringify(body.prices || {}),
       category_id || null,
+      farm_id || null,
       body.image_url || '',
       body.video_url || '',
       parseInt(body.stock) || 0,
