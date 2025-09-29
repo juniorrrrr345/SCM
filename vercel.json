@@ -16,6 +16,10 @@
       "maxDuration": 300,
       "memory": 3008
     },
+    "src/app/api/cloudflare/upload/[...params]/route.ts": {
+      "maxDuration": 300,
+      "memory": 3008
+    },
     "src/app/api/cloudflare/products/route.ts": {
       "maxDuration": 300,
       "memory": 3008
