@@ -11,7 +11,7 @@ interface MediaUploaderProps {
 export default function MediaUploader({ 
   onMediaSelected, 
   acceptedTypes = "image/*,video/*,.mov,.avi,.3gp,.mkv,.flv,.m4v,.wmv,.webm,.mp4,.ogg",
-  maxSize = 10, // Limite par défaut réduite
+  maxSize = 200, // Limite par défaut pour vidéos
   className = ""
 }: MediaUploaderProps) {
   const [uploading, setUploading] = useState(false);
@@ -21,19 +21,13 @@ export default function MediaUploader({
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Vérifier la taille selon le type de fichier
+    // Vérifier la taille selon le type de fichier (Cloudflare R2 limites)
     const isVideo = file.type.startsWith('video/');
-    const actualMaxSize = isVideo ? 10 : 5; // 10MB pour vidéos, 5MB pour images
+    const actualMaxSize = isVideo ? 200 : 10; // 200MB pour vidéos, 10MB pour images
     const maxBytes = actualMaxSize * 1024 * 1024;
     
     if (file.size > maxBytes) {
       setError(`Fichier trop volumineux: ${Math.round(file.size / 1024 / 1024)}MB. Maximum ${actualMaxSize}MB pour ${isVideo ? 'les vidéos' : 'les images'}.`);
-      return;
-    }
-    
-    // Vérification supplémentaire pour éviter les erreurs MongoDB
-    if (isVideo && file.size > 8 * 1024 * 1024) {
-      setError(`Vidéo trop volumineuse (${Math.round(file.size / 1024 / 1024)}MB). Utilisez max 8MB pour éviter les erreurs de base de données.`);
       return;
     }
 
