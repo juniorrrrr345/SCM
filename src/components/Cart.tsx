@@ -103,7 +103,7 @@ export default function Cart() {
       });
   }, []);
   
-  // Fonction pour envoyer une commande pour un service spécifique
+  // Fonction pour copier et préparer une commande pour Signal
   const handleSendOrderByService = async (targetService: 'livraison' | 'envoi' | 'meetup') => {
     // Filtrer les articles pour ce service
     const serviceItems = items.filter(item => item.service === targetService);
@@ -120,8 +120,8 @@ export default function Cart() {
     const serviceIcon = targetService === 'livraison' ? '🚚' : targetService === 'envoi' ? '📦' : '📍';
     const serviceName = targetService === 'livraison' ? 'Livraison à domicile' : targetService === 'envoi' ? 'Envoi postal' : 'Point de rencontre';
     
-    // Format optimisé pour Telegram (sans markdown qui peut causer des problèmes)
-    let message = `${serviceIcon} COMMANDE ${serviceName.toUpperCase()}:\n\n`;
+    // Format optimisé pour Signal
+    let message = `${serviceIcon} COMMANDE SCM - ${serviceName.toUpperCase()}\n\n`;
     
     serviceItems.forEach((item, index) => {
       const itemTotal = item.price * item.quantity;
@@ -144,68 +144,46 @@ export default function Cart() {
     
     message += `💰 TOTAL ${serviceName.toUpperCase()}: ${serviceTotal.toFixed(2)}€\n\n`;
     message += `📍 Service: ${serviceIcon} ${serviceName}\n\n`;
-    message += `Commande générée automatiquement depuis le site web`;
+    message += `Commande depuis le site SCM\n`;
+    message += `Merci de confirmer votre commande !`;
     
-    // Choisir le bon lien selon le service
-    let chosenLink = orderLink; // Fallback par défaut
-    
-    if (serviceLinks[targetService]) {
-      chosenLink = serviceLinks[targetService];
-      console.log(`📱 Utilisation du lien spécifique pour ${targetService}:`, chosenLink);
-    } else {
-      console.log(`📱 Pas de lien configuré pour ${targetService}, utilisation du lien principal`);
+    // Copier automatiquement le message dans le presse-papiers
+    try {
+      await navigator.clipboard.writeText(message);
+      console.log(`📋 Message copié pour ${targetService}:`, message);
+      
+      // Afficher une notification de succès avec instructions pour Signal
+      toast.success(
+        `📋 Message copié ! Collez-le maintenant dans Signal pour envoyer votre commande ${serviceName}`,
+        { duration: 6000 }
+      );
+      
+      // Vider le panier après 3 secondes
+      setTimeout(() => {
+        clearCart();
+        setIsOpen(false);
+        
+        // Message final pour rediriger vers Signal
+        toast(
+          `📱 Maintenant, ouvrez Signal et collez votre commande ${serviceName} !`,
+          { 
+            duration: 8000,
+            icon: '📱'
+          }
+        );
+      }, 3000);
+      
+    } catch (err) {
+      console.error('❌ Erreur copie presse-papiers:', err);
+      
+      // Fallback : afficher le message dans une popup
+      alert(`Voici votre commande à copier-coller dans Signal :\n\n${message}`);
+      
+      toast.success(`📱 Copiez le message affiché et envoyez-le dans Signal !`);
     }
-    
-    // Encoder le message pour l'URL
-    const encodedMessage = encodeURIComponent(message);
-    
-    // Construire l'URL selon le type de lien
-    let finalUrl = chosenLink;
-    
-    if (chosenLink.includes('wa.me')) {
-      // WhatsApp : ajouter le message
-      finalUrl = `${chosenLink}?text=${encodedMessage}`;
-    } else if (chosenLink.includes('t.me')) {
-      // Telegram : ajouter le message pré-rempli
-      // Note: Les liens d'invitation Telegram (avec +) ne supportent pas le paramètre text
-      if (chosenLink.includes('/+')) {
-        // Lien d'invitation : on ouvre sans message pré-rempli mais on copie dans le presse-papiers
-        finalUrl = chosenLink;
-        console.log('⚠️ Lien d\'invitation Telegram détecté, copie dans le presse-papiers');
-        try {
-          navigator.clipboard.writeText(message);
-          toast.success('📋 Message copié ! Collez-le dans Telegram après avoir rejoint');
-        } catch (err) {
-          console.log('Clipboard non disponible');
-        }
-      } else {
-        // Lien direct : on peut utiliser le paramètre text
-        if (chosenLink.includes('?')) {
-          finalUrl = `${chosenLink}&text=${encodedMessage}`;
-        } else {
-          finalUrl = `${chosenLink}?text=${encodedMessage}`;
-        }
-      }
-    } else {
-      // Autre lien : essayer d'ajouter le message quand même
-      const separator = chosenLink.includes('?') ? '&' : '?';
-      finalUrl = `${chosenLink}${separator}text=${encodedMessage}`;
-    }
-    
-    console.log(`📱 Service: ${targetService}`);
-    console.log(`📱 Lien choisi: ${chosenLink}`);
-    console.log(`📱 Message brut:`, message);
-    console.log(`📱 Message encodé:`, encodedMessage);
-    console.log(`📱 URL finale:`, finalUrl);
-    
-    // Ouvrir le lien de commande avec le message pré-rempli
-    window.open(finalUrl, '_blank');
-    
-    // Afficher un message de succès
-    toast.success(`📱 Commande ${serviceName} envoyée !`);
   };
 
-  // Fonction pour envoyer toute la commande (comportement original)
+  // Fonction pour créer une commande complète pour Signal
   const handleSendCompleteOrder = async () => {
     if (items.length === 0) {
       toast.error('Votre panier est vide');
@@ -217,7 +195,7 @@ export default function Cart() {
       return;
     }
     
-    // Grouper par service et envoyer séparément
+    // Grouper par service
     const serviceGroups = items.reduce((acc: Record<string, any[]>, item) => {
       const key = item.service!;
       if (!acc[key]) acc[key] = [];
@@ -225,22 +203,68 @@ export default function Cart() {
       return acc;
     }, {});
     
-    // Envoyer une commande pour chaque service
     const services = Object.keys(serviceGroups) as ('livraison' | 'envoi' | 'meetup')[];
+    const totalPrice = getTotalPrice();
     
-    for (const service of services) {
-      await handleSendOrderByService(service);
-      // Délai entre les envois pour éviter le spam
-      if (services.length > 1) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }
+    // Construire un message complet pour toute la commande
+    let completeMessage = `🛒 COMMANDE COMPLÈTE SCM\n\n`;
+    
+    services.forEach((service) => {
+      const serviceItems = serviceGroups[service];
+      const serviceIcon = service === 'livraison' ? '🚚' : service === 'envoi' ? '📦' : '📍';
+      const serviceName = service === 'livraison' ? 'Livraison' : service === 'envoi' ? 'Envoi' : 'Meetup';
+      const serviceTotal = serviceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      
+      completeMessage += `${serviceIcon} ${serviceName.toUpperCase()}\n`;
+      
+      serviceItems.forEach((item, index) => {
+        const itemTotal = item.price * item.quantity;
+        completeMessage += `${index + 1}. ${item.productName}\n`;
+        completeMessage += `   • ${item.quantity}x ${item.weight} - ${itemTotal.toFixed(2)}€\n`;
+        if (item.schedule) {
+          completeMessage += `   • Horaire: ${item.schedule}\n`;
+        }
+      });
+      
+      completeMessage += `   💰 Sous-total ${serviceName}: ${serviceTotal.toFixed(2)}€\n\n`;
+    });
+    
+    completeMessage += `💰 TOTAL GÉNÉRAL: ${totalPrice.toFixed(2)}€\n\n`;
+    completeMessage += `Commande depuis le site SCM\n`;
+    completeMessage += `Merci de confirmer votre commande !`;
+    
+    // Copier le message complet
+    try {
+      await navigator.clipboard.writeText(completeMessage);
+      console.log('📋 Message complet copié:', completeMessage);
+      
+      toast.success(
+        '📋 Commande complète copiée ! Collez-la dans Signal pour envoyer tous vos articles',
+        { duration: 6000 }
+      );
+      
+      // Vider le panier et fermer après 3 secondes
+      setTimeout(() => {
+        clearCart();
+        setIsOpen(false);
+        
+        toast(
+          '📱 Maintenant, ouvrez Signal et collez votre commande complète !',
+          { 
+            duration: 8000,
+            icon: '📱'
+          }
+        );
+      }, 3000);
+      
+    } catch (err) {
+      console.error('❌ Erreur copie presse-papiers:', err);
+      
+      // Fallback : afficher le message dans une popup
+      alert(`Voici votre commande complète à copier-coller dans Signal :\n\n${completeMessage}`);
+      
+      toast.success('📱 Copiez le message affiché et envoyez-le dans Signal !');
     }
-    
-    // Vider le panier après tous les envois
-    setTimeout(() => {
-      clearCart();
-      setIsOpen(false);
-    }, 2000);
   };
   
   if (!isOpen) return null;
@@ -634,20 +658,19 @@ export default function Cart() {
                         
                         return (
                           <div className="space-y-2">
-                            {hasConfiguredLink && (
-                              <div className="text-xs text-green-400 bg-green-500/10 p-2 rounded border border-green-500/20">
-                                🎯 Direction: Canal {serviceName}
-                              </div>
-                            )}
+                            <div className="text-xs text-blue-400 bg-blue-500/10 p-2 rounded border border-blue-500/20">
+                              📱 Le message sera copié automatiquement pour Signal
+                            </div>
                             <button
                               onClick={() => handleSendOrderByService(service)}
                               disabled={!isCartReadyForOrder()}
-                              className="w-full rounded-lg bg-gradient-to-r from-green-500 to-green-600 py-3 font-medium text-white hover:from-green-600 hover:to-green-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="w-full rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 py-3 font-medium text-white hover:from-blue-600 hover:to-blue-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.66-.52-.38L8.74 13.5l-4.4-1.39c-.96-.3-.96-1.22.07-1.57L22.61 3.6c.84-.35 1.63.34 1.28 1.28l-6.94 18.2c-.35.82-1.27.52-1.57-.07l-1.89-4.48c-.18-.42-.61-.68-1.07-.68-.46 0-.89.26-1.07.68l-1.89 4.48c-.3.59-1.22.89-1.57.07z"/>
+                                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
                               </svg>
-                              {serviceIcon} Envoyer vers Telegram {serviceName}
+                              {serviceIcon} Copier commande {serviceName}
                             </button>
                           </div>
                         );
@@ -657,7 +680,7 @@ export default function Cart() {
                           <div className="space-y-3">
                             <div className="text-sm text-blue-400 bg-blue-500/10 p-3 rounded border border-blue-500/20">
                               <p className="font-medium mb-2">📋 Plusieurs services détectés :</p>
-                              <p className="text-xs">Vous pouvez envoyer par service séparé ou tout ensemble</p>
+                              <p className="text-xs">Vous pouvez copier par service séparé ou tout ensemble pour Signal</p>
                             </div>
                             
                             {/* Boutons par service */}
@@ -675,8 +698,7 @@ export default function Cart() {
                                     className="w-full rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 py-3 font-medium text-white hover:from-blue-600 hover:to-blue-700 transition-all flex items-center justify-between px-4"
                                   >
                                     <span className="flex items-center gap-2">
-                                      {serviceIcon} {serviceName}
-                                      {hasConfiguredLink && <span className="text-xs bg-white/20 px-1 rounded">Canal dédié</span>}
+                                      📋 {serviceIcon} Copier {serviceName}
                                     </span>
                                     <span className="text-sm">{serviceTotal.toFixed(2)}€ • {serviceItems.length} art.</span>
                                   </button>
@@ -684,7 +706,7 @@ export default function Cart() {
                               );
                             })}
                             
-                            {/* Bouton pour tout envoyer */}
+                            {/* Bouton pour tout copier */}
                             <div className="pt-2 border-t border-gray-600">
                               <button
                                 onClick={handleSendCompleteOrder}
@@ -692,9 +714,10 @@ export default function Cart() {
                                 className="w-full rounded-lg bg-gradient-to-r from-green-500 to-green-600 py-3 font-medium text-white hover:from-green-600 hover:to-green-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                               >
                                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                  <path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.66-.52-.38L8.74 13.5l-4.4-1.39c-.96-.3-.96-1.22.07-1.57L22.61 3.6c.84-.35 1.63.34 1.28 1.28l-6.94 18.2c-.35.82-1.27.52-1.57-.07l-1.89-4.48c-.18-.42-.61-.68-1.07-.68-.46 0-.89.26-1.07.68l-1.89 4.48c-.3.59-1.22.89-1.57.07z"/>
+                                  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                                  <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
                                 </svg>
-                                📱 Envoyer TOUS les services
+                                📋 Copier TOUTE la commande
                               </button>
                             </div>
                           </div>
