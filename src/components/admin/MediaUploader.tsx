@@ -10,7 +10,7 @@ interface MediaUploaderProps {
 
 export default function MediaUploader({ 
   onMediaSelected, 
-  acceptedTypes = "image/*,video/*,.mov,.avi,.3gp",
+  acceptedTypes = "image/*,video/*,.mov,.avi,.3gp,.mkv,.flv,.m4v,.wmv,.webm,.mp4,.ogg",
   maxSize = 10, // Limite par défaut réduite
   className = ""
 }: MediaUploaderProps) {

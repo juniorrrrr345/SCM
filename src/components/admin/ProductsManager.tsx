@@ -1111,7 +1111,7 @@ export default function ProductsManager() {
                               updateField('video_url', url);
                             }
                           }}
-                          acceptedTypes="video/*,.mov,.avi,.3gp"
+                          acceptedTypes="video/*,.mov,.avi,.3gp,.mkv,.flv,.m4v,.wmv,.webm,.mp4,.ogg"
                           className="mb-2"
                         />
                       </div>
@@ -1125,7 +1125,7 @@ export default function ProductsManager() {
                               updateField('video_url', url);
                             }
                           }}
-                          acceptedTypes="video/*"
+                          acceptedTypes="video/*,.mov,.avi,.3gp,.mkv,.flv,.m4v,.wmv,.webm,.mp4,.ogg"
                           maxSize={5} // Très réduit pour éviter erreur 413
                           className="mb-2"
                         />

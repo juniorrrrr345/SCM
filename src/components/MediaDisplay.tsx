@@ -45,8 +45,8 @@ export default function MediaDisplay({
   // Debug de l'URL
   console.log('🔍 MediaDisplay URL:', url);
 
-  // Détection vidéo : MP4 classique + Cloudflare Video + iframe
-  const isVideo = /\.(mp4|webm|ogg|avi|mov|wmv)(\?|$)/i.test(url) || 
+  // Détection vidéo : formats étendus + Cloudflare Video + iframe
+  const isVideo = /\.(mp4|webm|ogg|avi|mov|wmv|mkv|flv|3gp|m4v|quicktime)(\?|$)/i.test(url) || 
                   url.includes('video/') ||
                   url.includes('/videos/') ||
                   url.includes('videodelivery.net') ||
@@ -129,7 +129,10 @@ export default function MediaDisplay({
           >
             <source src={url} type="video/mp4" />
             <source src={url} type="video/webm" />
-            Votre navigateur ne supporte pas la lecture vidéo.
+            <source src={url} type="video/ogg" />
+            <source src={url} type="video/mov" />
+            <source src={url} type="video/avi" />
+            Votre navigateur ne supporte pas la lecture vidéo. Formats supportés: MP4, WebM, OGG, MOV, AVI, MKV, FLV, 3GP, M4V.
           </video>
         )
       ) : (

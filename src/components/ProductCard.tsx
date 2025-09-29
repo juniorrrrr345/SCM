@@ -30,17 +30,37 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
       onClick={() => onClick(product)}
       className="bg-black/60 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] cursor-pointer group touch-manipulation w-full"
     >
-      {/* Container image avec badge */}
+      {/* Container image/vidéo avec badge */}
       <div className="relative aspect-square overflow-hidden">
-        {product.image_url ? (
+        {product.video_url ? (
+          // Priorité à la vidéo si disponible
+          <MediaDisplay
+            url={product.video_url}
+            alt={product.name}
+            className="w-full h-full"
+            controls={false}
+            autoPlay={false}
+            loop={true}
+            muted={true}
+          />
+        ) : product.image_url ? (
+          // Fallback sur l'image
           <img
             src={product.image_url}
             alt={product.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
+          // Placeholder si ni vidéo ni image
           <div className="w-full h-full bg-gray-800 flex items-center justify-center">
             <div className="text-gray-400 text-4xl">📷</div>
+          </div>
+        )}
+        
+        {/* Indicateur vidéo */}
+        {product.video_url && (
+          <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md shadow-lg">
+            🎥 VIDÉO
           </div>
         )}
         
