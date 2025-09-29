@@ -754,22 +754,40 @@ export default function Cart() {
                       </div>
                       
                       {/* Message dans zone auto-expandable */}
-                      <div className="bg-black rounded-lg p-4 overflow-y-auto max-h-80 min-h-[200px]">
+                      <div className="bg-black rounded-lg p-4 overflow-y-auto max-h-80 min-h-[200px] relative">
                         <div className="text-sm text-white whitespace-pre-wrap leading-relaxed select-all cursor-text">
                           {orderMessage}
                         </div>
+                        
+                        {/* Indicateur de scroll si le message est long */}
+                        {orderMessage.length > 300 && (
+                          <div className="absolute bottom-2 right-2 bg-blue-500/80 text-white text-xs px-2 py-1 rounded-full">
+                            ↕️ Scroll
+                          </div>
+                        )}
                       </div>
                     </div>
                     
-                    {/* Instructions simples */}
+                    {/* Instructions avec indicateur slide */}
                     <div className="text-center">
                       {messageCopied ? (
-                        <div className="text-green-400 text-sm font-medium bg-green-500/10 p-3 rounded-lg">
-                          ✅ Message copié ! Cliquez "Commander" en bas pour ouvrir Signal
+                        <div className="space-y-2">
+                          <div className="text-green-400 text-sm font-medium bg-green-500/10 p-3 rounded-lg">
+                            ✅ Message copié ! Scrollez en bas pour commander
+                          </div>
+                          {/* Indicateur slide animé */}
+                          <div className="flex flex-col items-center">
+                            <div className="text-blue-400 text-xs">👇 Scrollez pour commander</div>
+                            <div className="flex space-x-1 mt-1">
+                              <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
+                              <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
+                              <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+                            </div>
+                          </div>
                         </div>
                       ) : (
                         <div className="text-gray-400 text-sm bg-gray-800/30 p-3 rounded-lg">
-                          👆 Copiez le message ci-dessus, puis cliquez "Commander" en bas
+                          👆 Copiez le message ci-dessus
                         </div>
                       )}
                     </div>
@@ -804,7 +822,7 @@ export default function Cart() {
                         toast.error('❌ Aucun lien Signal configuré');
                       }
                     }}
-                    className="mt-3 w-full rounded-lg bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 py-4 font-bold text-white transition-all text-xl shadow-lg"
+                    className="mt-3 w-full rounded-lg bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 py-4 font-bold text-white transition-all text-xl shadow-lg animate-pulse"
                   >
                     📱 COMMANDER
                   </button>
