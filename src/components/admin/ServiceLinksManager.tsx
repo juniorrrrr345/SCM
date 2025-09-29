@@ -231,6 +231,10 @@ export default function ServiceLinksManager() {
     );
   }
 
+  // Interface désactivée - Utiliser Settings pour configurer Signal
+  return null;
+  
+  /* Section obsolète - Gardée en commentaire pour référence
   return (
     <div className="bg-gray-900 border border-white/20 rounded-xl p-6">
       {/* Header */}
@@ -543,4 +547,5 @@ export default function ServiceLinksManager() {
       </div>
     </div>
   );
+  */
 }
