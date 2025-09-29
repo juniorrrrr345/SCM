@@ -6,13 +6,14 @@ import SocialLinksManager from './SocialLinksManager';
 import SettingsManager from './SettingsManager';
 import PagesManager from './PagesManager';
 import ScheduleManager from './ScheduleManager';
+import FarmsManager from './FarmsManager';
 
 
 interface AdminDashboardProps {
   onLogout: () => void;
 }
 
-type SectionType = 'products' | 'categories' | 'settings' | 'pages' | 'social' | 'servicelinks';
+type SectionType = 'products' | 'categories' | 'farms' | 'settings' | 'pages' | 'social' | 'servicelinks';
 
 export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [activeSection, setActiveSection] = useState<SectionType>('products');
@@ -21,6 +22,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const menuItems = [
     { id: 'products' as SectionType, label: 'Produits', icon: '🛍️' },
     { id: 'categories' as SectionType, label: 'Catégories', icon: '🏷️' },
+    { id: 'farms' as SectionType, label: 'Fermes', icon: '🏭' },
     { id: 'settings' as SectionType, label: 'Configuration', icon: '⚙️' },
     { id: 'servicelinks' as SectionType, label: 'Horaires Services', icon: '⏰' },
     { id: 'pages' as SectionType, label: 'Pages', icon: '📄' },
@@ -33,6 +35,8 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
         return <ProductsManager />;
       case 'categories':
         return <CategoriesManager />;
+      case 'farms':
+        return <FarmsManager />;
       case 'settings':
         return <SettingsManager />;
       case 'servicelinks':

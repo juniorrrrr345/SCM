@@ -9,6 +9,7 @@ interface Product {
   id?: number;
   name: string;
   category: string;
+  farm?: string;
   image_url: string;
   video_url?: string;
   prices: {
@@ -26,6 +27,7 @@ const defaultPriceKeys = ['3g', '5g', '10g', '25g', '50g', '100g', '200g', '500g
 export default function ProductsManager() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
+  const [farms, setFarms] = useState<string[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
   const [loading, setLoading] = useState(true);
   const [preventReload, setPreventReload] = useState(false);
@@ -34,6 +36,7 @@ export default function ProductsManager() {
   const [formData, setFormData] = useState<Partial<Product>>({
     name: '',
     category: '',
+    farm: '',
     image_url: '',
     video_url: '',
     prices: {},
@@ -109,8 +112,20 @@ export default function ProductsManager() {
         setCategories([]);
       }
 
-      // Chargement farms supprimé
-      // Fermes supprimées de l'UI admin
+      // Charger les fermes avec cache-busting
+      console.log('🏭 Chargement des fermes...');
+      const farmsRes = await fetch(`/api/cloudflare/farms?t=${timestamp}`, { cache: 'no-store' });
+      console.log('🏭 Réponse fermes:', farmsRes.status);
+      if (farmsRes.ok) {
+        const farmsData = await farmsRes.json();
+        console.log('🏭 Fermes chargées:', farmsData.length, farmsData);
+        const farmNames = farmsData.map((f: { name: string }) => f.name);
+        console.log('🏭 Noms fermes pour dropdown:', farmNames);
+        setFarms(farmNames);
+      } else {
+        console.error('❌ Erreur fermes:', farmsRes.status);
+        setFarms([]);
+      }
       
       console.log('✅ Chargement terminé avec succès');
     } catch (error) {
@@ -747,7 +762,7 @@ export default function ProductsManager() {
     console.log('🔍 Barbara Punch dans le rendu:', {
       name: barbaraInRender.name,
       category: barbaraInRender.category,
-      farm: 'removed'
+      farm: formData.farm
     });
   }
   
@@ -756,7 +771,7 @@ export default function ProductsManager() {
     console.log('📝 FormData actuel:', {
       name: formData.name,
       category: formData.category,
-      farm: 'removed'
+      farm: formData.farm
     });
     console.log('📋 Catégories disponibles:', categories.slice(0, 5));
   }
@@ -1031,7 +1046,17 @@ export default function ProductsManager() {
                 </div>
 
                 <div>
-                  {/* Champ Farm supprimé */}
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Ferme (optionnel)</label>
+                  <select
+                    value={formData.farm || ''}
+                    onChange={(e) => updateField('farm', e.target.value)}
+                    className="w-full bg-gray-800 border border-white/20 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-white/50"
+                  >
+                    <option value="">Aucune ferme sélectionnée</option>
+                    {farms.map((farm) => (
+                      <option key={farm} value={farm}>{farm}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="space-y-4">
@@ -1305,7 +1330,19 @@ export default function ProductsManager() {
                       </select>
                     </div>
 
-                    {/* Champ Farm supprimé */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Ferme (optionnel)</label>
+                      <select
+                        value={formData.farm || ''}
+                        onChange={(e) => updateField('farm', e.target.value)}
+                        className="w-full bg-gray-800 border border-white/20 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-white/50"
+                      >
+                        <option value="">Aucune ferme sélectionnée</option>
+                        {farms.map((farm) => (
+                          <option key={farm} value={farm}>{farm}</option>
+                        ))}
+                      </select>
+                    </div>
 
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">Description</label>
