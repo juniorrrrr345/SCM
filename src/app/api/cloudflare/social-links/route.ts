@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 export async function GET() {
   try {
     const ACCOUNT_ID = '7979421604bd07b3bd34d3ed96222512';
-    const DATABASE_ID = '6df2df23-06af-4494-ba0f-30b2061c1def';
+    const DATABASE_ID = '301c5e01-cf71-4788-8025-ecc4dd7a9649';
     const API_TOKEN = 'ijkVhaXCw6LSddIMIMxwPL5CDAWznxip5x9I1bNW';
     
     const baseUrl = `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/d1/database/${DATABASE_ID}/query`;
@@ -55,7 +55,7 @@ export async function POST(request: Request) {
     }
 
     const ACCOUNT_ID = '7979421604bd07b3bd34d3ed96222512';
-    const DATABASE_ID = '6df2df23-06af-4494-ba0f-30b2061c1def';
+    const DATABASE_ID = '301c5e01-cf71-4788-8025-ecc4dd7a9649';
     const API_TOKEN = 'ijkVhaXCw6LSddIMIMxwPL5CDAWznxip5x9I1bNW';
     
     const baseUrl = `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/d1/database/${DATABASE_ID}/query`;

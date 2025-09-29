@@ -16,7 +16,7 @@
 
 ### Base de données D1
 - **Nom**: Mexicain
-- **UUID**: c2f265db-7c5d-4f33-a5dd-f84c602a013d
+- **UUID**: 301c5e01-cf71-4788-8025-ecc4dd7a9649
 - **Account ID**: 7979421604bd07b3bd34d3ed96222512
 
 ### Stockage R2
