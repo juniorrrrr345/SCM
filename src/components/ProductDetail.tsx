@@ -91,7 +91,7 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
         <div className="w-full h-full overflow-y-auto pb-20">
           {/* Image ou vidéo - avec support étendu */}
           <div className="relative w-full aspect-square bg-black">
-            {product.video_url ? (
+            {product.video_url && product.video_url.trim() !== '' ? (
               <MediaDisplay
                 url={product.video_url}
                 alt={product.name}
@@ -101,7 +101,7 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
                 loop={false}
                 muted={true}
               />
-            ) : product.image_url ? (
+            ) : product.image_url && product.image_url.trim() !== '' ? (
               <MediaDisplay
                 url={product.image_url}
                 alt={product.name}

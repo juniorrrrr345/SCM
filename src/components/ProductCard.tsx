@@ -32,7 +32,7 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
     >
       {/* Container image/vidéo avec badge */}
       <div className="relative aspect-square overflow-hidden">
-        {product.video_url ? (
+        {product.video_url && product.video_url.trim() !== '' ? (
           // Priorité à la vidéo si disponible
           <MediaDisplay
             url={product.video_url}
@@ -43,7 +43,7 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
             loop={true}
             muted={true}
           />
-        ) : product.image_url ? (
+        ) : product.image_url && product.image_url.trim() !== '' ? (
           // Fallback sur l'image
           <img
             src={product.image_url}
@@ -54,13 +54,6 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
           // Placeholder si ni vidéo ni image
           <div className="w-full h-full bg-gray-800 flex items-center justify-center">
             <div className="text-gray-400 text-4xl">📷</div>
-          </div>
-        )}
-        
-        {/* Indicateur vidéo */}
-        {product.video_url && (
-          <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md shadow-lg">
-            🎥 VIDÉO
           </div>
         )}
         
