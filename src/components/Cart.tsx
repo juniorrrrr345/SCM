@@ -167,15 +167,8 @@ export default function Cart() {
     // Passer à l'étape d'affichage du message
     setCurrentStep('message');
     
-    // Préparer la redirection vers Signal
-    if (chosenLink && chosenLink.trim() !== '') {
-      console.log(`📱 Lien Signal disponible:`, chosenLink);
-      
-      // Rediriger après un délai pour laisser le temps de lire
-      setTimeout(() => {
-        window.open(chosenLink, '_blank');
-      }, 2000);
-    }
+    // Stocker le lien Signal pour bouton manuel (pas de redirection auto)
+    console.log(`📱 Lien Signal disponible pour bouton manuel:`, chosenLink);
   };
 
   // Fonction pour créer une commande complète pour Signal
@@ -237,16 +230,8 @@ export default function Cart() {
     // Passer à l'étape d'affichage du message
     setCurrentStep('message');
     
-    // Préparer la redirection vers Signal principal
-    let signalLink = orderLink;
-    if (signalLink && signalLink.trim() !== '') {
-      console.log(`📱 Lien Signal principal disponible:`, signalLink);
-      
-      // Rediriger après un délai pour laisser le temps de copier
-      setTimeout(() => {
-        window.open(signalLink, '_blank');
-      }, 3000);
-    }
+    // Stocker le lien Signal principal pour bouton manuel
+    console.log(`📱 Lien Signal principal disponible pour bouton manuel:`, orderLink);
   };
   
   if (!isOpen) return null;
@@ -735,8 +720,13 @@ export default function Cart() {
                     <div className="text-center bg-green-500/10 border border-green-500/20 rounded-lg p-4">
                       <div className="text-green-400 font-medium mb-2">✅ Commande prête !</div>
                       <div className="text-sm text-gray-300">
-                        Copiez le message ci-dessous et Signal va s'ouvrir automatiquement
+                        Copiez le message et cliquez pour ouvrir Signal manuellement
                       </div>
+                      {orderLink && (
+                        <div className="text-xs text-blue-400 mt-2 bg-blue-500/10 p-2 rounded border border-blue-500/20">
+                          📱 Signal configuré : {orderLink.substring(0, 50)}...
+                        </div>
+                      )}
                     </div>
                     
                     <div className="bg-gray-800 border border-white/20 rounded-lg p-4">
@@ -766,20 +756,40 @@ export default function Cart() {
                     </div>
                     
                     <div className="text-center space-y-3">
-                      <div className="text-sm text-blue-400">
-                        📱 Signal va s'ouvrir dans 3 secondes...
+                      <div className="text-sm text-blue-400 bg-blue-500/10 p-3 rounded-lg">
+                        📋 <strong>Étapes :</strong><br/>
+                        1. Copiez le message ci-dessus<br/>
+                        2. Cliquez "Ouvrir Signal"<br/>
+                        3. Collez le message dans la conversation
                       </div>
                       
                       <div className="flex gap-3">
                         <button
                           onClick={() => {
                             if (orderLink && orderLink.trim() !== '') {
-                              window.open(orderLink, '_blank');
+                              try {
+                                console.log('📱 Tentative ouverture Signal:', orderLink);
+                                window.open(orderLink, '_blank');
+                                toast.success('📱 Signal ouvert ! Collez votre message dans la conversation');
+                              } catch (error) {
+                                console.error('❌ Erreur ouverture Signal:', error);
+                                toast.error('❌ Erreur ouverture Signal. Copiez le lien manuellement.');
+                                
+                                // Fallback : copier le lien
+                                try {
+                                  navigator.clipboard.writeText(orderLink);
+                                  toast.success('🔗 Lien Signal copié ! Ouvrez-le manuellement');
+                                } catch (e) {
+                                  console.error('Erreur copie lien:', e);
+                                }
+                              }
+                            } else {
+                              toast.error('❌ Aucun lien Signal configuré dans Settings');
                             }
                           }}
                           className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg font-medium"
                         >
-                          📱 Ouvrir Signal maintenant
+                          📱 Ouvrir Signal
                         </button>
                         
                         <button
@@ -788,6 +798,7 @@ export default function Cart() {
                             setIsOpen(false);
                             setCurrentStep('cart');
                             setOrderMessage('');
+                            toast.success('🛒 Commande terminée !');
                           }}
                           className="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 px-4 rounded-lg font-medium"
                         >
